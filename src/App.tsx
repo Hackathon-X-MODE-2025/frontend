@@ -3,8 +3,8 @@ import { Box } from "@mui/material"
 function App() {
 
   return (
-    <Box>
-      xMode
+    <Box className='bg-red-200'>
+      Main
     </Box>
   )
 }
