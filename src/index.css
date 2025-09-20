@@ -1,1 +1,12 @@
 @import "tailwindcss";
+
+
+
+
+
+
+
+/* Для Firefox */
+* {
+    scrollbar-width: thin;
+}
