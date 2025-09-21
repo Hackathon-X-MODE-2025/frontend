@@ -5,7 +5,7 @@ import { useParams } from "react-router-dom";
 
 export const EtlChat = () => {
     const { id } = useParams()
-    const { data: sessionData, isLoading, isError } = useGetSessionQuery(id, {
+    const { data: sessionData } = useGetSessionQuery(id, {
         pollingInterval: 1000,
         refetchOnMountOrArgChange: true,
     });
