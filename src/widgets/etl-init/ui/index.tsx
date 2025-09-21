@@ -1,11 +1,12 @@
 import { Box, Button, Checkbox, FormControlLabel, TextField } from "@mui/material"
 import { useAppSelector } from "../../../app/hooks"
 import { useEtlInitActions } from "../model/hooks"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import type { SourceSetting } from "../model/slice"
 import { useCreateSessionMutation } from "../../../entities/session/session-api"
 import { toast } from "react-toastify"
 import { useNavigate } from "react-router-dom"
+import { useLazyBrowseStoreQuery } from "../../../entities/hdfs/hdfs-api"
 
 
 const mockJsonFiles = [
@@ -14,7 +15,15 @@ const mockJsonFiles = [
     "part20.json",
 ];
 
+const typePathMap: any = {
+    CsvHDFSSourceSettings: '/dataset/csv/',
+    JsonHDFSSourceSettings: '/dataset/json/',
+    XmlHDFSSourceSettings: '/dataset/xml/'
+}
+
 export const EtlInit = () => {
+
+    const [browseStoreTrigger] = useLazyBrowseStoreQuery()
 
     const navigate = useNavigate()
 
@@ -23,9 +32,13 @@ export const EtlInit = () => {
 
     const { addItem, reset } = useEtlInitActions()
 
-    const [type, setType] = useState<"CsvSourceSettings" | "JsonSourceSettings" | "XmlSourceSettings" | null>(null);
+    const [type, setType] = useState<"CsvHDFSSourceSettings" | "JsonHDFSSourceSettings" | "XmlHDFSSourceSettings" | null>(null);
     const [selectedFiles, setSelectedFiles] = useState<string[]>([]);
     const [param, setParam] = useState("");
+    const [s3Data, setS3Data] = useState<any[]>([])
+    const [s3Path, setS3Path] = useState('/')
+    const [isSuccess, setSuccess] = useState(false)
+
 
     const handleToggleFile = (file: string) => {
         setSelectedFiles((prev) =>
@@ -33,27 +46,43 @@ export const EtlInit = () => {
         );
     };
 
+    useEffect(() => {
+        if (!type) return
+        browseStoreTrigger(typePathMap[type])
+            .unwrap()
+            .then((res) => {
+                setS3Path(typePathMap[type])
+                setS3Data(res)
+                setSuccess(true)
+            })
+            .catch(() => {
+                setSuccess(false)
+                setType(null)
+                toast.error('Системная ошибка')
+            })
+    }, [type])
+
     const handleSave = () => {
         if (!type || selectedFiles.length === 0) return;
 
         let payload: SourceSetting;
 
-        if (type === "CsvSourceSettings") {
+        if (type === "CsvHDFSSourceSettings") {
             payload = {
                 type,
                 delimiter: param || ",",
-                s3Paths: selectedFiles,
+                paths: selectedFiles,
             };
-        } else if (type === "XmlSourceSettings") {
+        } else if (type === "XmlHDFSSourceSettings") {
             payload = {
                 type,
                 rootTag: param || "root",
-                s3Paths: selectedFiles,
+                paths: selectedFiles,
             };
         } else {
             payload = {
-                type: 'JsonSourceSettings',
-                s3Paths: selectedFiles,
+                type: 'JsonHDFSSourceSettings',
+                paths: selectedFiles,
             };
         }
 
@@ -79,16 +108,28 @@ export const EtlInit = () => {
             })
     };
 
+    const handleChangeDir = (name: string) => {
+        browseStoreTrigger(s3Path + name + '/')
+            .unwrap()
+            .then((res) => {
+                setS3Path(s3Path + name + '/')
+                setS3Data(res)
+            })
+            .catch(() => {
+                toast.error('Системная ошибка')
+            })
+    }
+
     if (!isEtlMode) return null
 
     return (
         <Box className='flex gap-2 justify-center items-center w-full'>
-            <Box className="flex flex-col gap-6 p-6 w-full">
+            <Box className="flex flex-col gap-6 p-6 w-full ">
                 {!type && (
                     <Box className="flex gap-4 justify-center items-center w-full">
-                        <Button variant="outlined" onClick={() => setType("CsvSourceSettings")}>CSV</Button>
-                        <Button variant="outlined" onClick={() => setType("JsonSourceSettings")}>JSON</Button>
-                        <Button variant="outlined" onClick={() => setType("XmlSourceSettings")}>XML</Button>
+                        <Button variant="outlined" onClick={() => setType("CsvHDFSSourceSettings")}>CSV</Button>
+                        <Button variant="outlined" onClick={() => setType("JsonHDFSSourceSettings")}>JSON</Button>
+                        <Button variant="outlined" onClick={() => setType("XmlHDFSSourceSettings")}>XML</Button>
                     </Box>
                 )}
 
@@ -105,29 +146,37 @@ export const EtlInit = () => {
                 )}
 
 
-                {type && (
-                    <Box className="bg-[#181818] rounded-xl p-4 text-white">
-                        <h3 className="font-semibold mb-2">Выбери файлы ({type.toUpperCase()})</h3>
-                        <Box className='flex flex-col max-h-[60%] scroll-auto overflow-y-auto'>
+                {type && isSuccess && (
+                    <Box className="bg-[#181818] rounded-xl p-4 text-white   overflow-y-auto max-h-[40vh] ">
+                        <h3 className="font-semibold mb-2">Выбери файлы</h3>
+                        <Box className='flex flex-col scroll-auto'>
 
-                            {mockJsonFiles.map((file) => (
-                                <FormControlLabel
-                                    key={file}
-                                    control={
-                                        <Checkbox
-                                            checked={selectedFiles.includes(file)}
-                                            onChange={() => handleToggleFile(file)}
-                                        />
+                            {s3Data.map((file) => (
+                                <>
+                                    {
+                                        file.directory
+                                            ? <button onClick={() => handleChangeDir(file.name)}>{file.name}</button>
+                                            : <FormControlLabel
+                                                key={s3Path + file.name}
+                                                control={
+                                                    <Checkbox
+                                                        checked={selectedFiles.includes(s3Path + file.name)}
+                                                        onChange={() => handleToggleFile(s3Path + file.name)}
+                                                    />
+                                                }
+                                                label={file.name}
+                                            />
                                     }
-                                    label={file}
-                                />
+
+                                </>
+
                             ))}
                         </Box>
 
                     </Box>
                 )}
 
-                {type === "CsvSourceSettings" && (
+                {type === "CsvHDFSSourceSettings" && isSuccess && (
                     <TextField
                         label="Delimiter"
                         value={param}
@@ -144,7 +193,7 @@ export const EtlInit = () => {
                         }}
                     />
                 )}
-                {type === "XmlSourceSettings" && (
+                {type === "XmlHDFSSourceSettings" && isSuccess && (
                     <TextField
                         label="Root tag"
                         value={param}
@@ -165,16 +214,16 @@ export const EtlInit = () => {
                 {/* Сохранить */}
 
                 {
-                    type && <Button
+                    type && isSuccess && <Button
                         variant="outlined"
                         color="inherit"
-                        onClick={() => setType(null)}
+                        onClick={() => { setType(null); setSuccess(false) }}
                     >
                         Назад
                     </Button>
                 }
 
-                {type && (
+                {type && isSuccess && (
                     <Button
                         variant="contained"
                         color="success"

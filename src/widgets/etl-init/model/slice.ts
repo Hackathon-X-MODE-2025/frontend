@@ -1,20 +1,20 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 
 interface CsvSource {
-    type: "CsvSourceSettings";
+    type: "CsvHDFSSourceSettings";
     delimiter: string;
-    s3Paths: string[];
+    paths: string[];
 }
 
 interface JsonSource {
-    type: "JsonSourceSettings";
-    s3Paths: string[];
+    type: "JsonHDFSSourceSettings";
+    paths: string[];
     field?: string;
 }
 
 interface XmlSource {
-    type: "XmlSourceSettings";
-    s3Paths: string[];
+    type: "XmlHDFSSourceSettings";
+    paths: string[];
     rootTag: string;
 }
 
