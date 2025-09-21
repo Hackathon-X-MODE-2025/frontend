@@ -9,12 +9,6 @@ import { useNavigate } from "react-router-dom"
 import { useLazyBrowseStoreQuery } from "../../../entities/hdfs/hdfs-api"
 
 
-const mockJsonFiles = [
-    "part2.json",
-    "part19.json",
-    "part20.json",
-];
-
 const typePathMap: any = {
     CsvHDFSSourceSettings: '/dataset/csv/',
     JsonHDFSSourceSettings: '/dataset/json/',
