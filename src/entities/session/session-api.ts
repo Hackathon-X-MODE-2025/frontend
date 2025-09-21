@@ -26,7 +26,7 @@ export const sessionApi = API.injectEndpoints({
             query: () => `/etl-setup/sessions`
         }),
         getSession: builder.query({
-            query: (id) => `/etl-setup/sessions?id=${id}`
+            query: (id) => `/etl-setup/sessions/${id}`
         })
     })
 })

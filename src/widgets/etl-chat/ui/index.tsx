@@ -1,9 +1,20 @@
 import { Box } from "@mui/material"
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import { useGetSessionQuery } from "../../../entities/session/session-api";
+import { useParams } from "react-router-dom";
 
 export const EtlChat = () => {
+    const { id } = useParams()
+    const { data: sessionData, isLoading, isError } = useGetSessionQuery(id, {
+        pollingInterval: 1000,
+        refetchOnMountOrArgChange: true,
+    });
+
     return (
         <Box className="bottom-0 absolute w-full flex items-center justify-center gap-2 p-4">
+            {
+                sessionData?.status === 'ANALYZING' && 'ANALYZING'
+            }
             <textarea
                 className="w-10/12 min-h-[80px] bg-[#303030] text-white placeholder-slate-400
       rounded-xl p-4 text-base outline-none resize-none
