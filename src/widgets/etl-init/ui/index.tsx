@@ -17,6 +17,7 @@ import { EtlParamForm } from "../../../features/etl-param-form/ui"
 import { soruceMap } from "../../../shared/constants/etl-setup"
 import { EtlSourcestable } from "../../../features/etl-sources-table/ui"
 import { EtlSetupAnalyze } from "../../../features/etl-setup-analyze/ui"
+import { getParentPath } from "../../../shared/utils/etl-setup"
 
 export const EtlInit = () => {
 
@@ -102,7 +103,6 @@ export const EtlInit = () => {
             .then((res) => {
                 if (type === null) return
                 const filtrationData = res.filter((el) => {
-                    console.log(soruceMap[type] === el.name?.split('.').slice(-1)[0])
                     return el.directory || soruceMap[type] === el.name?.split('.').slice(-1)[0]
                 })
                 setS3Data(filtrationData)
@@ -207,14 +207,29 @@ export const EtlInit = () => {
             })
     };
 
-    const handleChangeDir = (name: string) => {
+    const handleChangeDir = (name: string, isBack?: boolean) => {
+        if (isBack) {
+            browseStoreTrigger(getParentPath(s3Path))
+                .unwrap()
+                .then((res) => {
+                    if (type === null) return
+                    setS3Path(getParentPath(s3Path))
+                    const filtrationData = res.filter((el) => {
+                        return el.directory || soruceMap[type] === el.name?.split('.').slice(-1)[0]
+                    })
+                    setS3Data(filtrationData)
+                })
+                .catch(() => {
+                    toast.error('Системная ошибка')
+                })
+            return
+        }
         browseStoreTrigger(s3Path + name + '/')
             .unwrap()
             .then((res) => {
                 if (type === null) return
                 setS3Path(s3Path + name + '/')
                 const filtrationData = res.filter((el) => {
-                    console.log(soruceMap[type] === el.name?.split('.').slice(-1)[0])
                     return el.directory || soruceMap[type] === el.name?.split('.').slice(-1)[0]
                 })
                 setS3Data(filtrationData)

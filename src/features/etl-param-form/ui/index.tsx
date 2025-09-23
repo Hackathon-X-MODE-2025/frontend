@@ -1,4 +1,5 @@
 import type React from "react";
+import { PlusIco } from "../../../shared/svg_components/plus-ico";
 
 interface IEtlParamForm {
     param: string;
@@ -30,7 +31,10 @@ export const EtlParamForm: React.FC<IEtlParamForm> = ({ param, handleParam, hand
                 />
             )}
             {
-                isTable && <button onClick={handleSave} className="text-default h-[53px] border-1 border-secondary  rounded-[10px] ml-[30px] cursor-pointer px-[20px]">ДОБАВИТЬ</button>
+                isTable && <button onClick={handleSave} className="flex  items-center gap-[10px] text-default h-[53px] border-1 border-secondary hover:bg-[#65658C40] transition-all ease-in-out duration-200  rounded-[10px] ml-[30px] cursor-pointer px-[20px]">
+                    <PlusIco />
+                    ДОБАВИТЬ
+                </button>
             }
 
 
