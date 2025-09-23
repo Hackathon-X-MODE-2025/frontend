@@ -6,7 +6,7 @@ import { EtlInit } from "../../../widgets/etl-init/ui"
 
 export const WorkSpace = () => {
     return (
-        <Box className='flex h-full justify-center items-center'>
+        <Box className='flex h-full overflow-hidden'>
             <ModeSelect />
             <DefaultChat />
             <EtlInit />

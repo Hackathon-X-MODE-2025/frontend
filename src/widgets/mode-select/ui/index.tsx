@@ -1,6 +1,8 @@
 import { Box } from "@mui/material"
 import { useAppDispatch, useAppSelector } from "../../../app/hooks"
 import { setDefaultChatMode, setEtlMode } from "../model/slice"
+import { DefaultChatIco } from "../../../shared/svg_components/default-chat-ico"
+import { EtlChatIco } from "../../../shared/svg_components/elt-chat-ico"
 
 
 export const ModeSelect = () => {
@@ -22,20 +24,19 @@ export const ModeSelect = () => {
     if (!isModeSelect) return null
 
     return (
-        <Box className='flex gap-2 items-center'>
-            <button
-                onClick={defaultChat}
-                className="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl px-8 py-4 text-lg shadow-lg hover:shadow-indigo-700/50 transition cursor-pointer"
-            >
-                Начать чат
-            </button>
-
-            <button
-                onClick={modeEtl}
-                className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-xl px-8 py-4 text-lg shadow-lg hover:shadow-emerald-700/50 transition cursor-pointer"
-            >
-                Режим ETL
-            </button>
+        <Box className='flex gap-[30px] items-center'>
+            <div onClick={defaultChat} className="w-[369px] h-[200px] bg-secondary flex p-[30px] rounded-[10px] items-start cursor-pointer">
+                <div className="w-full flex items-center justify-between">
+                    <span className="text-title">Начать чат</span>
+                    <DefaultChatIco />
+                </div>
+            </div>
+            <div onClick={modeEtl} className="w-[369px] h-[200px] bg-secondary flex p-[30px] rounded-[10px] items-start cursor-pointer">
+                <div className="w-full flex items-center justify-between">
+                    <span className="text-title">ETL-режим</span>
+                    <EtlChatIco />
+                </div>
+            </div>
         </Box>
     )
 }
