@@ -25,13 +25,13 @@ export const ModeSelect = () => {
 
     return (
         <Box className='flex w-full gap-[30px] items-center justify-center'>
-            <div onClick={defaultChat} className="w-[369px] h-[200px] bg-secondary flex p-[30px] rounded-[10px] items-start cursor-pointer">
+            <div onClick={defaultChat} className="w-[369px] h-[200px] bg-secondary hover:bg-[#403F56] transition ease-in-out flex p-[30px] rounded-[10px] items-start cursor-pointer">
                 <div className="w-full flex items-center justify-between">
                     <span className="text-title">Начать чат</span>
                     <DefaultChatIco />
                 </div>
             </div>
-            <div onClick={modeEtl} className="w-[369px] h-[200px] bg-secondary flex p-[30px] rounded-[10px] items-start cursor-pointer">
+            <div onClick={modeEtl} className="w-[369px] h-[200px] bg-secondary hover:bg-[#403F56] transition ease-in-out flex p-[30px] rounded-[10px] items-start cursor-pointer">
                 <div className="w-full flex items-center justify-between">
                     <span className="text-title">ETL-режим</span>
                     <EtlChatIco />

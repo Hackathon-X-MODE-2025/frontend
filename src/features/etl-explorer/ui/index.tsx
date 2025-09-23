@@ -2,18 +2,20 @@ import type React from "react";
 import type { IBrowseStoreRes } from "../../../entities/hdfs/hdfs-api"
 import { FolderIco } from "../../../shared/svg_components/folder-ico"
 import { icoHelper } from "../../../shared/utils/etl-setup"
+import { formatDate, formatSize } from "../../../shared/utils/format";
 
 interface IEtlExplorer {
     s3Data: [] | IBrowseStoreRes[],
     selectedFiles: any;
     handleToggleFile: (path: string) => void;
-    handleChangeDir: (path: string) => void;
+    handleChangeDir: (path: string, isBack?: boolean) => void;
     s3Path: string;
 }
 
 export const EtlExplorer: React.FC<IEtlExplorer> = ({ s3Data, selectedFiles, handleToggleFile, handleChangeDir, s3Path }) => {
     return (
         <div className="flex-1 overflow-y-auto border border-b-0 border-secondary">
+
             <table className="min-w-full text-sm text-left ">
                 <thead className=" text-gray-300 uppercase text-xs font-semibold">
                     <tr>
@@ -26,9 +28,34 @@ export const EtlExplorer: React.FC<IEtlExplorer> = ({ s3Data, selectedFiles, han
                     </tr>
                 </thead>
                 <tbody className="">
+                    {
+                        s3Path !== '/' && (
+                            <tr className="relative hover:bg-[#65658C1A] border-b border-[#65658C80]">
+                                <td className="px-4 py-3 ">
+
+                                </td>
+                                <td className="px-4 py-3 flex items-center gap-2 ">
+                                    {
+                                        <button onClick={() => handleChangeDir(s3Path, true)} className="flex items-center gap-1 cursor-pointer">
+                                            <FolderIco />
+                                            ..
+                                        </button>
+                                    }
+
+
+                                </td>
+                                <td className="px-4 py-3 whitespace-nowrap">
+                                    -
+                                </td>
+                                <td className="px-4 py-3 whitespace-nowrap">
+                                    -
+                                </td>
+                            </tr>
+                        )
+                    }
                     {s3Data.map((file) => (
-                        <tr key={file.name} className="hover:bg-gray-800/50 transition">
-                            <td className="px-4 py-3">
+                        <tr key={file.name} className="relative hover:bg-[#65658C1A] border-b border-[#65658C80]">
+                            <td className="px-4 py-3 ">
                                 {
                                     !file.directory && <input
                                         type="checkbox"
@@ -38,7 +65,7 @@ export const EtlExplorer: React.FC<IEtlExplorer> = ({ s3Data, selectedFiles, han
                                     />
                                 }
                             </td>
-                            <td className="px-4 py-3 flex items-center gap-2">
+                            <td className="px-4 py-3 flex items-center gap-2 ">
                                 {
                                     file.directory && (
                                         <button onClick={() => handleChangeDir(file.name)} className="flex items-center gap-1 cursor-pointer">
@@ -55,8 +82,12 @@ export const EtlExplorer: React.FC<IEtlExplorer> = ({ s3Data, selectedFiles, han
                                 </>)}
 
                             </td>
-                            <td className="px-4 py-3 whitespace-nowrap">{file.size}</td>
-                            <td className="px-4 py-3 whitespace-nowrap">{file.lastModified}</td>
+                            <td className="px-4 py-3 whitespace-nowrap">
+                                {formatSize(Number(file.size))}
+                            </td>
+                            <td className="px-4 py-3 whitespace-nowrap">
+                                {formatDate(file.lastModified)}
+                            </td>
                         </tr>
                     ))}
                 </tbody>

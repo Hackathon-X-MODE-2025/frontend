@@ -33,3 +33,15 @@ export const icoHelper = (type: string) => {
         return <ClickhouseIco />
     }
 }
+
+export function getParentPath(path: string) {
+    // убираем последний `/`
+    const trimmed = path.endsWith('/') ? path.slice(0, -1) : path;
+
+    // разбиваем по `/`, убираем последний элемент и собираем обратно
+    const parts = trimmed.split('/');
+    parts.pop();
+
+    // собираем обратно с `/` и гарантируем слэш в конце
+    return parts.join('/') + '/';
+}

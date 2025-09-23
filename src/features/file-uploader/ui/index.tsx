@@ -39,7 +39,7 @@ export const FileUploader: React.FC<any> = ({ s3Path, handleRefetch }) => {
             <button
                 type="button"
                 onClick={triggerFileInput}
-                className="flex items-center gap-[16px] bg-secondary py-[20px] px-[47px] rounded-[10px] cursor-pointer"
+                className="flex items-center gap-[16px] bg-secondary hover:bg-[#403F56] transition ease-in-out py-[20px] px-[47px] rounded-[10px] cursor-pointer"
             >
                 <UploadIco />
                 <span className="text-default">Загрузить файл</span>
