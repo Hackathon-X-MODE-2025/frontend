@@ -5,9 +5,9 @@ import { Sidebar } from "./widgets/sidebar/ui"
 function App() {
 
   return (
-    <Box className='flex h-screen'>
+    <Box className='flex h-screen font-sans'>
       <Sidebar />
-      <main className="w-full bg-[#212121] p-6 text-white">
+      <main className="w-full bg-primary p-14 text-white h-full overflow-hidden">
         <Outlet />
       </main>
     </Box>

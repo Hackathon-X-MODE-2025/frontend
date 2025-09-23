@@ -18,7 +18,27 @@ interface XmlSource {
     rootTag: string;
 }
 
-export type SourceSetting = CsvSource | JsonSource | XmlSource;
+interface ClickHouseSource {
+    type: string;
+    host: string;
+    port: string;
+    username: string;
+    password: string;
+    database: string;
+}
+
+interface PostgreSQLSource {
+    type: string;
+    host: string;
+    port: string;
+    username: string;
+    password: string;
+    schema: string;
+    database: string;
+}
+
+
+export type SourceSetting = CsvSource | JsonSource | XmlSource | ClickHouseSource | PostgreSQLSource;
 
 export interface IEtlInitSlice {
     sourceSettings: SourceSetting[] | [];
