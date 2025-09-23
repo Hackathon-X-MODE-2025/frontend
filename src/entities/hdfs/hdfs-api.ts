@@ -15,14 +15,15 @@ export const hdfsApi = API.injectEndpoints({
             query: (path) => `hdfs/browse?path=${path}`,
         }),
 
-        uploadFiles: builder.mutation<{ file: string; success: boolean }[], File[]>({
-            async queryFn(files, api, _extra, baseQuery) {
+        uploadFiles: builder.mutation<{ file: string; success: boolean }[], { files: File[]; path: string }>({
+            async queryFn({ files, path }, api, _extra, baseQuery) {
                 const results: { file: string; success: boolean }[] = [];
 
                 for (const file of files) {
+                    api.dispatch(setProgress({ file: file.name, progress: 0 }));
                     try {
                         const createRes = await baseQuery({
-                            url: `hdfs/s3/multipart/create?key=ad/${file.name}`,
+                            url: `hdfs/s3/multipart/create?key=${path}${file.name}`,
                             method: "POST",
                         });
                         if (createRes.error) throw createRes.error;
@@ -36,7 +37,7 @@ export const hdfsApi = API.injectEndpoints({
                             const chunk = file.slice(i, i + chunkSize);
 
                             const presignRes = await baseQuery({
-                                url: `hdfs/s3/multipart/presign?key=ad/${file.name}&uploadId=${uploadId}&partNumber=${partNumber}`,
+                                url: `hdfs/s3/multipart/presign?key=${path}${file.name}&uploadId=${uploadId}&partNumber=${partNumber}`,
                                 method: "GET",
                             });
                             if (presignRes.error) throw presignRes.error;
@@ -55,7 +56,7 @@ export const hdfsApi = API.injectEndpoints({
                         }
 
                         await baseQuery({
-                            url: `hdfs/s3/multipart/complete?key=ad/${file.name}&uploadId=${uploadId}`,
+                            url: `hdfs/s3/multipart/complete?key=${path}${file.name}&uploadId=${uploadId}`,
                             method: "POST",
                             body: parts,
                         });

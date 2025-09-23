@@ -1,9 +1,9 @@
 import { API } from "../../app/api";
-import type { SourceSetting } from "../../widgets/etl-init/model/slice";
+import type { SourceSettingReq } from "../../widgets/etl-init/model/slice";
 
 
-interface ICreateSessionReq {
-    sourceSettings: SourceSetting[]
+export interface ICreateSessionReq {
+    sourceSettings: SourceSettingReq[]
 }
 
 interface ICreateSessionRes {

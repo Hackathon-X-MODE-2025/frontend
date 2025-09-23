@@ -24,7 +24,7 @@ export const ModeSelect = () => {
     if (!isModeSelect) return null
 
     return (
-        <Box className='flex gap-[30px] items-center'>
+        <Box className='flex w-full gap-[30px] items-center justify-center'>
             <div onClick={defaultChat} className="w-[369px] h-[200px] bg-secondary flex p-[30px] rounded-[10px] items-start cursor-pointer">
                 <div className="w-full flex items-center justify-between">
                     <span className="text-title">Начать чат</span>
