@@ -4,41 +4,47 @@ interface CsvSource {
     type: "CsvHDFSSourceSettings";
     delimiter: string;
     paths: string[];
+    id: string;
 }
 
 interface JsonSource {
     type: "JsonHDFSSourceSettings";
     paths: string[];
     field?: string;
+    id: string;
 }
 
 interface XmlSource {
     type: "XmlHDFSSourceSettings";
     paths: string[];
     rootTag: string;
+    id: string;
 }
 
 interface ClickHouseSource {
-    type: string;
+    type: 'ClickHouseSourceSettings';
     host: string;
     port: string;
     username: string;
     password: string;
     database: string;
+    id: string;
 }
 
 interface PostgreSQLSource {
-    type: string;
+    type: 'PostgreSQLSourceSettings';
     host: string;
     port: string;
     username: string;
     password: string;
     schema: string;
     database: string;
+    id: string;
 }
 
 
 export type SourceSetting = CsvSource | JsonSource | XmlSource | ClickHouseSource | PostgreSQLSource;
+export type SourceSettingReq = Omit<SourceSetting, "id">;
 
 export interface IEtlInitSlice {
     sourceSettings: SourceSetting[] | [];
@@ -57,12 +63,13 @@ export const etlInitSlice = createSlice({
             temp.push(payload)
             state.sourceSettings = [...temp]
         },
-        // remooveEtlSource: (state, {payload}) => {
-        //     const temp = [...state.sourceSettings].filter((el) => el.s3Paths !=== payload)
+        remooveEtlSource: (state, { payload }) => {
+            const temp = [...state.sourceSettings].filter((el) => el.id !== payload)
+            state.sourceSettings = [...temp]
 
-        // },
+        },
         resetEtlSources: () => initialState
     }
 })
 
-export const { addEtlSource, resetEtlSources } = etlInitSlice.actions
+export const { addEtlSource, resetEtlSources, remooveEtlSource } = etlInitSlice.actions

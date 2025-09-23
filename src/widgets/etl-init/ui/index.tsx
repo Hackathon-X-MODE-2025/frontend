@@ -1,16 +1,22 @@
-import { Box, Button, Checkbox, FormControlLabel, TextField } from "@mui/material"
 import { useAppSelector } from "../../../app/hooks"
 import { useEtlInitActions } from "../model/hooks"
 import { useEffect, useState } from "react"
-import type { SourceSetting } from "../model/slice"
+import type { SourceSetting, SourceSettingReq } from "../model/slice"
 import { useCreateSessionMutation } from "../../../entities/session/session-api"
 import { toast } from "react-toastify"
 import { useNavigate } from "react-router-dom"
 import { useLazyBrowseStoreQuery, type IBrowseStoreRes } from "../../../entities/hdfs/hdfs-api"
 import { FileUploader } from "../../../features/file-uploader/ui"
-import { UploadIco } from "../../../shared/svg_components/upload-ico"
-import { CsvIco } from "../../../shared/svg_components/csv-ico"
-import { FolderIco } from "../../../shared/svg_components/folder-ico"
+import { v4 as uuidv4 } from "uuid";
+import { EtlTabs } from "../../../features/etl-tabs/ui"
+import type { IEtlType } from "../model/types"
+import { EtlExplorer } from "../../../features/etl-explorer/ui"
+import { EtlPostgreSourceForm } from "../../../features/etl-postgre-source-form/ui"
+import { EtlClickHouseSourceForm } from "../../../features/etl-clickhouse-source-form/ui"
+import { EtlParamForm } from "../../../features/etl-param-form/ui"
+import { soruceMap } from "../../../shared/constants/etl-setup"
+import { EtlSourcestable } from "../../../features/etl-sources-table/ui"
+import { EtlSetupAnalyze } from "../../../features/etl-setup-analyze/ui"
 
 export const EtlInit = () => {
 
@@ -21,14 +27,15 @@ export const EtlInit = () => {
     const isEtlMode = useAppSelector((state) => state.modeSelectSlice.isEtlMode)
     const sourceSettings = useAppSelector((s) => s.etlInitSlice.sourceSettings);
 
-    const { addItem, reset } = useEtlInitActions()
+    const { addItem, reset, remove } = useEtlInitActions()
 
-    const [type, setType] = useState<"CsvHDFSSourceSettings" | "JsonHDFSSourceSettings" | "XmlHDFSSourceSettings" | "PostgreSQLSourceSettings" | "ClickHouseSourceSettings" | null>(null);
+    const [type, setType] = useState<IEtlType | null>(null);
     const [selectedFiles, setSelectedFiles] = useState<string[]>([]);
     const [param, setParam] = useState("");
     const [s3Data, setS3Data] = useState<IBrowseStoreRes[] | []>([])
     const [s3Path, setS3Path] = useState('/')
     const [isSuccess, setSuccess] = useState(false)
+    const [validateionError, setValidationError] = useState(false)
 
     const [clickhouseForm, setClickHouseForm] = useState({
         type: "ClickHouseSourceSettings",
@@ -76,7 +83,10 @@ export const EtlInit = () => {
             .unwrap()
             .then((res) => {
                 setS3Path('/')
-                setS3Data(res)
+                const filtrationData = res.filter((el) => {
+                    return el.directory || soruceMap[type] === el.name?.split('.').slice(-1)[0]
+                })
+                setS3Data(filtrationData)
                 setSuccess(true)
             })
             .catch(() => {
@@ -86,22 +96,54 @@ export const EtlInit = () => {
             })
     }, [type])
 
+    const handleRefetch = () => {
+        browseStoreTrigger(s3Path)
+            .unwrap()
+            .then((res) => {
+                if (type === null) return
+                const filtrationData = res.filter((el) => {
+                    console.log(soruceMap[type] === el.name?.split('.').slice(-1)[0])
+                    return el.directory || soruceMap[type] === el.name?.split('.').slice(-1)[0]
+                })
+                setS3Data(filtrationData)
+            })
+            .catch(() => {
+                toast.error('Системная ошибка')
+            })
+    }
+
+
+    useEffect(() => {
+        setType('CsvHDFSSourceSettings')
+    }, [])
+
+
     const handleSave = () => {
         if (!type) return;
+        if ((type === "CsvHDFSSourceSettings" || type === "XmlHDFSSourceSettings") && !param) {
+            setValidationError(true);
+            return;
+        }
 
-        let payload: SourceSetting;
+        const selectedFilesLentghPass = selectedFiles.length > 0
 
-        if (type === "CsvHDFSSourceSettings") {
+        let payload: SourceSetting | null;
+
+        const id = uuidv4();
+
+        if (type === "CsvHDFSSourceSettings" && selectedFilesLentghPass) {
             payload = {
                 type,
-                delimiter: param || ",",
+                delimiter: param,
                 paths: selectedFiles,
+                id: id
             };
-        } else if (type === "XmlHDFSSourceSettings") {
+        } else if (type === "XmlHDFSSourceSettings" && selectedFilesLentghPass) {
             payload = {
                 type,
-                rootTag: param || "root",
+                rootTag: param,
                 paths: selectedFiles,
+                id: id
             };
         } else if (type === 'PostgreSQLSourceSettings') {
             payload = {
@@ -111,7 +153,8 @@ export const EtlInit = () => {
                 username: postgreForm.username,
                 password: postgreForm.password,
                 schema: postgreForm.schema,
-                database: postgreForm.database
+                database: postgreForm.database,
+                id: id
             };
         } else if (type === 'ClickHouseSourceSettings') {
             payload = {
@@ -120,17 +163,23 @@ export const EtlInit = () => {
                 port: clickhouseForm.port,
                 username: clickhouseForm.username,
                 password: clickhouseForm.password,
-                database: clickhouseForm.database
+                database: clickhouseForm.database,
+                id: id
             };
-        } else {
+        } else if (type === 'JsonHDFSSourceSettings' && selectedFilesLentghPass) {
             payload = {
                 type: 'JsonHDFSSourceSettings',
                 paths: selectedFiles,
+                id: id
             };
+        } else {
+            payload = null
         }
 
+
+        if (payload === null) return
+
         addItem(payload)
-        setType(null);
         setSelectedFiles([]);
         setParam("");
     };
@@ -138,8 +187,15 @@ export const EtlInit = () => {
     const [createSessionTrigger] = useCreateSessionMutation()
 
     const handleAnalyze = () => {
+
+        const resultSources: SourceSettingReq[] = sourceSettings.map((el) => {
+            const { id, ...rest } = el
+            return {
+                ...rest
+            }
+        })
         createSessionTrigger({
-            sourceSettings: sourceSettings
+            sourceSettings: resultSources
         })
             .unwrap()
             .then((res) => {
@@ -155,13 +211,27 @@ export const EtlInit = () => {
         browseStoreTrigger(s3Path + name + '/')
             .unwrap()
             .then((res) => {
+                if (type === null) return
                 setS3Path(s3Path + name + '/')
-                setS3Data(res)
+                const filtrationData = res.filter((el) => {
+                    console.log(soruceMap[type] === el.name?.split('.').slice(-1)[0])
+                    return el.directory || soruceMap[type] === el.name?.split('.').slice(-1)[0]
+                })
+                setS3Data(filtrationData)
             })
             .catch(() => {
                 toast.error('Системная ошибка')
             })
     }
+
+    const handleEtlType = (name: IEtlType) => {
+        setType(name)
+    }
+
+    const handleParam = (param: string) => {
+        setParam(param)
+    }
+
 
     if (!isEtlMode) return null
 
@@ -172,402 +242,65 @@ export const EtlInit = () => {
             <div className="w-7/12 bg-primary flex flex-col h-full">
                 <span className="text-subtitle">Проводник</span>
 
-                {/* // Загрузка файлов */}
-                <div className="mt-[25px] flex items-center border-2 border-secondary rounded-[10px] p-[20px]">
-                    <button className="flex items-center gap-[16px] bg-secondary py-[20px] px-[47px] rounded-[10px] cursor-pointer">
-                        <UploadIco />
-                        <span className="text-default">Загрузить файл</span>
-                    </button>
-                    <div className="ml-[30px]">
-                        В разработке...
-                    </div>
-                </div>
-                {/* // Таблица и табы */}
-                <div className="w-full flex items-center gap-1 mt-[30px]">
-                    <button
-                        onClick={() => setType("CsvHDFSSourceSettings")}
-                        className={`text-default ${type === 'CsvHDFSSourceSettings' ? 'bg-secondary' : 'bg-primary'} rounded-tr-[10px] rounded-tl-[10px] min-w-[88px] border-2 border-secondary cursor-pointer h-[42px]`}>
-                        Csv
-                    </button>
-                    <button
-                        onClick={() => setType("JsonHDFSSourceSettings")}
-                        className={`text-default ${type === 'JsonHDFSSourceSettings' ? 'bg-secondary' : 'bg-primary'} px-[26px] rounded-tr-[10px] rounded-tl-[10px] min-w-[88px] border-2 border-secondary cursor-pointer h-[42px]`}>
-                        Json
-                    </button>
-                    <button
-                        onClick={() => setType("XmlHDFSSourceSettings")}
-                        className={`text-default ${type === 'XmlHDFSSourceSettings' ? 'bg-secondary' : 'bg-primary'}  px-[26px] rounded-tr-[10px] rounded-tl-[10px] min-w-[88px] border-2 border-secondary cursor-pointer h-[42px]`}>
-                        Xml
-                    </button>
-                    <button
-                        onClick={() => setType("ClickHouseSourceSettings")}
-                        className={`text-default ${type === 'ClickHouseSourceSettings' ? 'bg-secondary' : 'bg-primary'}  px-[26px] rounded-tr-[10px] rounded-tl-[10px] min-w-[88px] border-2 border-secondary cursor-pointer h-[42px]`}>
-                        ClickHouse
-                    </button>
-                    <button
-                        onClick={() => setType("PostgreSQLSourceSettings")}
-                        className={`text-default ${type === 'PostgreSQLSourceSettings' ? 'bg-secondary' : 'bg-primary'} px-[26px] rounded-tr-[10px] rounded-tl-[10px] min-w-[88px] border-2 border-secondary cursor-pointer h-[42px]`}>
-                        PostgreSQL
-                    </button>
-                </div>
+                {/*  Загрузка файлов */}
+                <FileUploader s3Path={s3Path} handleRefetch={handleRefetch} />
 
+                {/*  Таблица и табы */}
+                <EtlTabs type={type} handleType={handleEtlType} />
+
+
+                {/* Проводник */}
                 {
                     isTable && (
+                        <EtlExplorer
+                            handleToggleFile={handleToggleFile}
+                            handleChangeDir={handleChangeDir}
+                            selectedFiles={selectedFiles}
+                            s3Path={s3Path}
+                            s3Data={s3Data}
 
-                        <div className="flex-1 overflow-y-auto border border-b-0 border-secondary">
-                            <table className="min-w-full text-sm text-left ">
-                                <thead className=" text-gray-300 uppercase text-xs font-semibold">
-                                    <tr>
-                                        <th className="px-4 py-3 w-10">
-                                            <input type="checkbox" className="h-4 w-4 rounded border-gray-500 bg-gray-700" />
-                                        </th>
-                                        <th className="px-4 py-3">Имя</th>
-                                        <th className="px-4 py-3">Размер</th>
-                                        <th className="px-4 py-3">Дата загрузки</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="">
-                                    {s3Data.map((file) => (
-                                        <tr key={file.name} className="hover:bg-gray-800/50 transition">
-                                            <td className="px-4 py-3">
-                                                <input
-                                                    type="checkbox"
-                                                    className="h-4 w-4 rounded "
-                                                    checked={selectedFiles.includes(s3Path + file.name)}
-                                                    onChange={() => handleToggleFile(s3Path + file.name)}
-                                                />
-                                            </td>
-                                            <td className="px-4 py-3 flex items-center gap-2">
-                                                {
-                                                    file.directory && (
-                                                        <button onClick={() => handleChangeDir(file.name)} className="flex items-center gap-1 cursor-pointer">
-                                                            <FolderIco />
-                                                            {file.name}
-                                                        </button>
-                                                    )
-                                                }
-                                                {!file.directory && (<>
-                                                    <CsvIco />
-                                                    {file.name}
-                                                </>)}
-
-                                            </td>
-                                            <td className="px-4 py-3 whitespace-nowrap">{file.size}</td>
-                                            <td className="px-4 py-3 whitespace-nowrap">{file.lastModified}</td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
+                        />
                     )
                 }
 
+                {/* Кликхаус */}
                 {
                     !isTable && type === 'ClickHouseSourceSettings' && (
-                        <div className="flex-1 overflow-y-auto border border-b-0 border-secondary flex items-center justify-center">
-
-                            <div className="flex flex-col gap-[20px]">
-
-                                <div className="flex items-center gap-[20px]">
-                                    <div className="flex flex-col gap-1">
-                                        <span className="text-small">Host</span>
-                                        <input
-                                            onChange={(e) => handleChangeClickHouseForm(e.target.name, e.target.value)}
-                                            value={clickhouseForm.host}
-                                            name="host"
-                                            className="h-[53px] bg-secondary px-[20px] rounded-[10px] w-[350px]"
-                                            placeholder="Введите Host"
-                                        />
-                                    </div>
-                                    <div className="flex flex-col gap-1">
-                                        <span className="text-small">Порт</span>
-                                        <input
-                                            onChange={(e) => handleChangeClickHouseForm(e.target.name, e.target.value)}
-                                            value={clickhouseForm.port}
-                                            name="port"
-                                            className="h-[53px] bg-secondary px-[20px] rounded-[10px] w-[350px]"
-                                            placeholder="Введите порт"
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className="flex items-center gap-[20px]">
-                                    <div className="flex flex-col gap-1">
-                                        <span className="text-small">Логин</span>
-                                        <input
-                                            onChange={(e) => handleChangeClickHouseForm(e.target.name, e.target.value)}
-                                            value={clickhouseForm.username}
-                                            name="username"
-                                            className="h-[53px] bg-secondary px-[20px] rounded-[10px] w-[350px]"
-                                            placeholder="Введите Логин"
-                                        />
-                                    </div>
-                                    <div className="flex flex-col gap-1">
-                                        <span className="text-small">Пароль</span>
-                                        <input
-                                            onChange={(e) => handleChangeClickHouseForm(e.target.name, e.target.value)}
-                                            value={clickhouseForm.password}
-                                            name="password"
-                                            className="h-[53px] bg-secondary px-[20px] rounded-[10px] w-[350px]"
-                                            placeholder="Введите Пароль"
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className="flex items-center ">
-                                    <div className="flex flex-col gap-1">
-                                        <span className="text-small">Имя базы данных</span>
-                                        <input
-                                            onChange={(e) => handleChangeClickHouseForm(e.target.name, e.target.value)}
-                                            value={clickhouseForm.database}
-                                            name="database"
-                                            className="h-[53px] bg-secondary px-[20px] rounded-[10px] w-[350px]"
-                                            placeholder="Введите имя"
-                                        />
-                                    </div>
-                                    <button className="text-default h-[53px] border-1 border-secondary  rounded-[10px] ml-[20px] cursor-pointer px-[20px] self-end">ДОБАВИТЬ</button>
-                                </div>
-
-                            </div>
-
-
-
-                        </div>
+                        <EtlClickHouseSourceForm handleChangeClickHouseForm={handleChangeClickHouseForm} clickhouseForm={clickhouseForm} handleSave={handleSave} />
                     )
                 }
 
+                {/* Постгре */}
                 {
                     !isTable && type === 'PostgreSQLSourceSettings' && (
-                        <div className="flex-1 overflow-y-auto border border-b-0 border-secondary flex items-center justify-center">
-
-                            <div className="flex flex-col gap-[20px]">
-
-                                <div className="flex items-center gap-[20px]">
-                                    <div className="flex flex-col gap-1">
-                                        <span className="text-small">Host</span>
-                                        <input
-                                            onChange={(e) => handleChangePostgreForm(e.target.name, e.target.value)}
-                                            value={postgreForm.host}
-                                            name="host"
-                                            className="h-[53px] bg-secondary px-[20px] rounded-[10px] w-[350px]"
-                                            placeholder="Введите Host"
-                                        />
-                                    </div>
-                                    <div className="flex flex-col gap-1">
-                                        <span className="text-small">Порт</span>
-                                        <input
-                                            onChange={(e) => handleChangePostgreForm(e.target.name, e.target.value)}
-                                            value={postgreForm.port}
-                                            name="port"
-                                            className="h-[53px] bg-secondary px-[20px] rounded-[10px] w-[350px]"
-                                            placeholder="Введите порт"
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className="flex items-center gap-[20px]">
-                                    <div className="flex flex-col gap-1">
-                                        <span className="text-small">Логин</span>
-                                        <input
-                                            onChange={(e) => handleChangePostgreForm(e.target.name, e.target.value)}
-                                            value={postgreForm.username}
-                                            name="username"
-                                            className="h-[53px] bg-secondary px-[20px] rounded-[10px] w-[350px]"
-                                            placeholder="Введите Логин"
-                                        />
-                                    </div>
-                                    <div className="flex flex-col gap-1">
-                                        <span className="text-small">Пароль</span>
-                                        <input
-                                            onChange={(e) => handleChangePostgreForm(e.target.name, e.target.value)}
-                                            value={postgreForm.password}
-                                            name="password"
-                                            className="h-[53px] bg-secondary px-[20px] rounded-[10px] w-[350px]"
-                                            placeholder="Введите Пароль"
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className="flex items-center gap-[20px]">
-                                    <div className="flex flex-col gap-1">
-                                        <span className="text-small">Имя базы данных</span>
-                                        <input
-                                            onChange={(e) => handleChangePostgreForm(e.target.name, e.target.value)}
-                                            value={postgreForm.database}
-                                            name="database"
-                                            className="h-[53px] bg-secondary px-[20px] rounded-[10px] w-[350px]"
-                                            placeholder="Введите имя"
-                                        />
-                                    </div>
-                                    <div className="flex flex-col gap-1">
-                                        <span className="text-small">Схема</span>
-                                        <input
-                                            onChange={(e) => handleChangePostgreForm(e.target.name, e.target.value)}
-                                            value={postgreForm.schema}
-                                            name="schema"
-                                            className="h-[53px] bg-secondary px-[20px] rounded-[10px] w-[350px]"
-                                            placeholder="Введите имя"
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className="flex items-center ">
-
-                                    <button className="text-default h-[53px] border-1 border-secondary  rounded-[10px]  cursor-pointer px-[20px] self-end">ДОБАВИТЬ</button>
-                                </div>
-
-                            </div>
-
-
-
-                        </div>
+                        <EtlPostgreSourceForm handleChangePostgreForm={handleChangePostgreForm} postgreForm={postgreForm} handleSave={handleSave} />
                     )
                 }
 
-                <div className="w-full flex items-center p-[20px] border border-t-0 border-secondary rounded-[10px]">
-                    {type === "CsvHDFSSourceSettings" && isSuccess && (
-                        <input
-                            value={param}
-                            onChange={(e) => setParam(e.target.value)}
-                            className="p-[20px] h-[53px] w-[40%] bg-secondary rounded-[10px] text-default"
-                            placeholder="Введите разделитель..."
-                        />
-                    )}
-                    {type === "XmlHDFSSourceSettings" && isSuccess && (
-                        <input
-                            value={param}
-                            onChange={(e) => setParam(e.target.value)}
-                            className="p-[20px] h-[53px] w-[40%] bg-secondary rounded-[10px] text-default"
-                            placeholder="Введите тэг..."
-                        />
-                    )}
-                    {
-                        isTable && <button onClick={handleSave} className="text-default h-[53px] border-1 border-secondary  rounded-[10px] ml-[30px] cursor-pointer px-[20px]">ДОБАВИТЬ</button>
-                    }
-
-
-
-                </div>
+                {/* Параметр */}
+                <EtlParamForm
+                    param={param}
+                    handleParam={handleParam}
+                    handleSave={handleSave}
+                    isSuccess={isSuccess}
+                    isTable={isTable}
+                    type={type}
+                    validateionError={validateionError}
+                />
 
             </div>
-            <div className="w-5/12 h-full bg-secondary">
 
+            <div className="w-5/12 h-full flex flex-col">
+                <span className="text-subtitle">Источники</span>
+                {/* Таблица источников */}
+                <EtlSourcestable remove={remove} sourceSettings={sourceSettings} />
+
+                {/* Анализ */}
+                {sourceSettings.length > 0 && (
+                    <EtlSetupAnalyze handleAnalyze={handleAnalyze} />
+                )}
             </div>
+
         </div>
-        // <Box className='flex gap-2 justify-center items-center w-full'>
-        //     <Box className="flex flex-col gap-6 p-6 w-full ">
-        //         {!type && (
-        //             <Box className="flex gap-4 justify-center items-center w-full">
-        //                 <Button variant="outlined" onClick={() => setType("CsvHDFSSourceSettings")}>CSV</Button>
-        //                 <Button variant="outlined" onClick={() => setType("JsonHDFSSourceSettings")}>JSON</Button>
-        //                 <Button variant="outlined" onClick={() => setType("XmlHDFSSourceSettings")}>XML</Button>
-        //             </Box>
-        //         )}
-        //         <FileUploader />
-
-
-        //         {sourceSettings.length > 0 && (
-        //             <Button
-        //                 variant="contained"
-        //                 color="primary"
-        //                 size="large"
-        //                 onClick={handleAnalyze}
-        //             >
-        //                 Начать анализ
-        //             </Button>
-        //         )}
-
-
-        //         {type && isSuccess && (
-        //             <Box className="bg-[#181818] rounded-xl p-4 text-white   overflow-y-auto max-h-[40vh] ">
-        //                 <h3 className="font-semibold mb-2">Выбери файлы</h3>
-        //                 <Box className='flex flex-col scroll-auto'>
-
-        //                     {s3Data.map((file) => (
-        //                         <>
-        //                             {
-        //                                 file.directory
-        //                                     ? <button onClick={() => handleChangeDir(file.name)}>{file.name}</button>
-        //                                     : <FormControlLabel
-        //                                         key={s3Path + file.name}
-        //                                         control={
-        //                                             <Checkbox
-        //                                                 checked={selectedFiles.includes(s3Path + file.name)}
-        //                                                 onChange={() => handleToggleFile(s3Path + file.name)}
-        //                                             />
-        //                                         }
-        //                                         label={file.name}
-        //                                     />
-        //                             }
-
-        //                         </>
-
-        //                     ))}
-        //                 </Box>
-
-        //             </Box>
-        //         )}
-
-        //         {type === "CsvHDFSSourceSettings" && isSuccess && (
-        //             <TextField
-        //                 label="Delimiter"
-        //                 value={param}
-        //                 onChange={(e) => setParam(e.target.value)}
-        //                 variant="outlined"
-        //                 fullWidth
-        //                 sx={{
-        //                     "& .MuiOutlinedInput-root": {
-        //                         bgcolor: "#1e293b",
-        //                         borderRadius: "0.75rem",
-        //                         color: "white",
-        //                     },
-        //                     "& .MuiInputLabel-root": { color: "#94a3b8" },
-        //                 }}
-        //             />
-        //         )}
-        //         {type === "XmlHDFSSourceSettings" && isSuccess && (
-        //             <TextField
-        //                 label="Root tag"
-        //                 value={param}
-        //                 onChange={(e) => setParam(e.target.value)}
-        //                 variant="outlined"
-        //                 fullWidth
-        //                 sx={{
-        //                     "& .MuiOutlinedInput-root": {
-        //                         bgcolor: "#1e293b",
-        //                         borderRadius: "0.75rem",
-        //                         color: "white",
-        //                     },
-        //                     "& .MuiInputLabel-root": { color: "#94a3b8" },
-        //                 }}
-        //             />
-        //         )}
-
-        //         {/* Сохранить */}
-
-        //         {
-        //             type && isSuccess && <Button
-        //                 variant="outlined"
-        //                 color="inherit"
-        //                 onClick={() => { setType(null); setSuccess(false) }}
-        //             >
-        //                 Назад
-        //             </Button>
-        //         }
-
-        //         {type && isSuccess && (
-        //             <Button
-        //                 variant="contained"
-        //                 color="success"
-        //                 disabled={selectedFiles.length === 0}
-        //                 onClick={handleSave}
-        //             >
-        //                 Сохранить
-        //             </Button>
-        //         )}
-        //     </Box>
-        // </Box>
     )
 }
-
-

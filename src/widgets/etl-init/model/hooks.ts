@@ -1,11 +1,12 @@
 import { useAppDispatch } from "../../../app/hooks"
-import { addEtlSource, resetEtlSources, type SourceSetting } from "./slice"
+import { addEtlSource, remooveEtlSource, resetEtlSources, type SourceSetting } from "./slice"
 
 
 export const useEtlInitActions = () => {
     const dispatch = useAppDispatch()
     return {
         addItem: (data: SourceSetting) => dispatch(addEtlSource(data)),
-        reset: () => dispatch(resetEtlSources())
+        reset: () => dispatch(resetEtlSources()),
+        remove: (id: string) => dispatch(remooveEtlSource(id))
     }
 }
