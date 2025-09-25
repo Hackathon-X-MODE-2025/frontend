@@ -24,7 +24,7 @@ export const Sidebar = () => {
             setSessionsArray((prev) => {
                 const existingIds = new Set(prev.map((s) => s.id))
                 const uniqueNew = sessionsData.content.filter(
-                    (s) => !existingIds.has(s.id)
+                    (s: any) => !existingIds.has(s.id)
                 )
                 return [...prev, ...uniqueNew]
             })

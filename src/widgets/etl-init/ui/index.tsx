@@ -16,7 +16,6 @@ import { EtlClickHouseSourceForm } from "../../../features/etl-clickhouse-source
 import { EtlParamForm } from "../../../features/etl-param-form/ui"
 import { soruceMap } from "../../../shared/constants/etl-setup"
 import { EtlSourcestable } from "../../../features/etl-sources-table/ui"
-import { EtlSetupAnalyze } from "../../../features/etl-setup-analyze/ui"
 import { getParentPath } from "../../../shared/utils/etl-setup"
 import { EtlSetupContinue } from "../../../features/etl-setup-continue/ui"
 import { PreAnalyzeModal } from "../../../features/etl-preanalyze-modal/ui"
