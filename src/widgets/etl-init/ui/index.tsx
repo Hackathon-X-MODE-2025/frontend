@@ -18,6 +18,8 @@ import { soruceMap } from "../../../shared/constants/etl-setup"
 import { EtlSourcestable } from "../../../features/etl-sources-table/ui"
 import { EtlSetupAnalyze } from "../../../features/etl-setup-analyze/ui"
 import { getParentPath } from "../../../shared/utils/etl-setup"
+import { EtlSetupContinue } from "../../../features/etl-setup-continue/ui"
+import { PreAnalyzeModal } from "../../../features/etl-preanalyze-modal/ui"
 
 export const EtlInit = () => {
 
@@ -32,9 +34,12 @@ export const EtlInit = () => {
 
     const [type, setType] = useState<IEtlType | null>(null);
     const [selectedFiles, setSelectedFiles] = useState<string[]>([]);
+
     const [param, setParam] = useState("");
+
     const [s3Data, setS3Data] = useState<IBrowseStoreRes[] | []>([])
     const [s3Path, setS3Path] = useState('/')
+
     const [isSuccess, setSuccess] = useState(false)
     const [validateionError, setValidationError] = useState(false)
 
@@ -57,6 +62,14 @@ export const EtlInit = () => {
         database: "etl-setup"
     })
 
+    const [preanalyzeForm, setPreAnalazyForm] = useState({
+        expectedSizeInGB: null,
+        updateRate: '',
+        schedulerRate: '',
+    })
+
+    const [isPreAnalyzeModal, setPreAnalyzeModal] = useState(false)
+
     const handleToggleFile = (file: string) => {
         setSelectedFiles((prev) =>
             prev.includes(file) ? prev.filter((f) => f !== file) : [...prev, file]
@@ -74,6 +87,13 @@ export const EtlInit = () => {
     const handleChangePostgreForm = (name: string, value: string) => {
         setPostgreForm({
             ...postgreForm,
+            [name]: value
+        })
+    }
+
+    const handleChangePreAnalyzeForm = (name: string, value: string) => {
+        setPreAnalazyForm({
+            ...preanalyzeForm,
             [name]: value
         })
     }
@@ -195,10 +215,19 @@ export const EtlInit = () => {
             }
         })
         createSessionTrigger({
-            sourceSettings: resultSources
+            sourceSettings: resultSources,
+            expectedSizeInGB: Number(preanalyzeForm.expectedSizeInGB),
+            updateRate: preanalyzeForm.updateRate,
+            schedulerRate: preanalyzeForm.schedulerRate
         })
             .unwrap()
             .then((res) => {
+                setPreAnalyzeModal(false)
+                setPreAnalazyForm({
+                    expectedSizeInGB: null,
+                    updateRate: '',
+                    schedulerRate: '',
+                })
                 reset()
                 navigate(`/s/${res.id}`);
             })
@@ -246,6 +275,15 @@ export const EtlInit = () => {
     const handleParam = (param: string) => {
         setParam(param)
     }
+
+    const handleContinue = () => {
+        setPreAnalyzeModal(true)
+    }
+
+    const handleClosePreanalyzed = () => {
+        setPreAnalyzeModal(false)
+    }
+
 
 
     if (!isEtlMode) return null
@@ -310,11 +348,21 @@ export const EtlInit = () => {
                 {/* Таблица источников */}
                 <EtlSourcestable remove={remove} sourceSettings={sourceSettings} />
 
+                {/* Продолжить */}
+                <EtlSetupContinue handleContinue={handleContinue} />
                 {/* Анализ */}
-                {sourceSettings.length > 0 && (
+                {/* {sourceSettings.length > 0 && (
                     <EtlSetupAnalyze handleAnalyze={handleAnalyze} />
-                )}
+                )} */}
             </div>
+
+            <PreAnalyzeModal
+                open={isPreAnalyzeModal}
+                handleClose={handleClosePreanalyzed}
+                handleChangePreAnalyzeForm={handleChangePreAnalyzeForm}
+                formValue={preanalyzeForm}
+                complete={handleAnalyze}
+            />
 
         </div>
     )

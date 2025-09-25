@@ -5,6 +5,6 @@ export const API = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: 'https://hack-2025.bigtows.org/',
   }),
-  tagTypes: [''],
+  tagTypes: ['session'],
   endpoints: () => ({}),
 });

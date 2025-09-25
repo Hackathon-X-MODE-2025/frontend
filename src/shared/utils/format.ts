@@ -14,3 +14,16 @@ export const formatDate = (timestamp: string | number): string => {
         minute: "2-digit",
     });
 };
+
+
+export function formatCreatedDate(dateString: string) {
+    const d = new Date(dateString);
+    return d.toLocaleString("ru-RU", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+    });
+}
+

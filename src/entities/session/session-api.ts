@@ -3,7 +3,10 @@ import type { SourceSettingReq } from "../../widgets/etl-init/model/slice";
 
 
 export interface ICreateSessionReq {
-    sourceSettings: SourceSettingReq[]
+    sourceSettings: SourceSettingReq[];
+    expectedSizeInGB: number,
+    schedulerRate: string;
+    updateRate: string;
 }
 
 interface ICreateSessionRes {
@@ -20,10 +23,12 @@ export const sessionApi = API.injectEndpoints({
                     method: 'POST',
                     body
                 }
-            }
+            },
+            invalidatesTags: ['session']
         }),
         getSessions: builder.query({
-            query: () => `/etl-setup/sessions`
+            query: ({ page, pageSize }) => `/etl-setup/sessions?page=${page}&size=${pageSize}`,
+            providesTags: ['session']
         }),
         getSession: builder.query({
             query: (id) => `/etl-setup/sessions/${id}`
