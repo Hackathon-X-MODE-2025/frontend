@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 export const SessionsChooseSource = () => {
     const { id } = useParams()
 
-    const { data: sessionData, isSuccess, isLoading } = useGetSessionQuery(id, {
+    const { data: sessionData, isSuccess, isFetching } = useGetSessionQuery(id, {
         pollingInterval: 1000,
         refetchOnMountOrArgChange: true,
     });
@@ -61,7 +61,7 @@ export const SessionsChooseSource = () => {
 
         setSortedData(tmp)
 
-    }, [isLoading])
+    }, [isFetching])
 
 
     const handleChooseRecomendation = (name: string) => {
