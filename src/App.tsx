@@ -7,7 +7,7 @@ function App() {
   return (
     <Box className='flex h-screen font-sans'>
       <Sidebar />
-      <main className="w-full bg-primary p-14 text-white h-full overflow-hidden">
+      <main className="w-full bg-primary text-white h-full overflow-hidden">
         <Outlet />
       </main>
     </Box>

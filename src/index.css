@@ -8,17 +8,38 @@
     font-style: normal;
 }
 
+@font-face {
+    font-family: "Raleway";
+    src: url("./shared/fonts/Raleway-Regular.ttf") format("truetype");
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "Raleway";
+    src: url("./shared/fonts/Raleway-Bold.ttf") format("truetype");
+    font-weight: 700;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "Raleway";
+    src: url("./shared/fonts/Raleway-SemiBold.ttf") format("truetype");
+    font-weight: 600;
+    font-style: normal;
+}
+
 @theme {
     --color-primary: #1b1920;
     --color-secondary: #272735;
     --font-sans: "IgraSans", ui-sans-serif, system-ui, sans-serif;
+    --font-raleway: "Raleway", ui-sans-serif, system-ui, sans-serif;
     --text-title: 36px;
     --text-subtitle: 24px;
     --text-default: 18px;
     --text-small: 14px;
     --color-primaryHover: #403F56;
 }
-
 
 
 

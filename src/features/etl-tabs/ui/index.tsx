@@ -7,7 +7,7 @@ interface IEtlTabs {
 
 export const EtlTabs: React.FC<IEtlTabs> = ({ handleType, type }) => {
     return (
-        <div className="w-full flex items-center gap-1 mt-[30px]">
+        <div className="w-full flex items-center gap-1 mt-[30px] overflow-hidden">
             <button
                 onClick={() => handleType("CsvHDFSSourceSettings")}
                 className={`text-default ${type === 'CsvHDFSSourceSettings' ? 'bg-secondary' : 'bg-primary'} hover:bg-secondary transition-all ease-in-out duration-200 rounded-tr-[10px] rounded-tl-[10px] min-w-[88px] border-2 border-secondary cursor-pointer h-[42px]`}>
