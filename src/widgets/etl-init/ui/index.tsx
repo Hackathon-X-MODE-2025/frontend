@@ -138,6 +138,10 @@ export const EtlInit = () => {
 
 
     const handleSave = () => {
+        if (sourceSettings.length > 0) {
+            toast.warning('Можно выбрать только 1 источник')
+            return
+        }
         if (!type) return;
         if ((type === "CsvHDFSSourceSettings" || type === "XmlHDFSSourceSettings") && !param) {
             setValidationError(true);
@@ -342,7 +346,7 @@ export const EtlInit = () => {
 
             </div>
 
-            <div className="w-5/12 h-full flex flex-col">
+            <div className="w-5/12 h-full flex flex-col overflow-hidden">
                 <span className="text-subtitle">Источники</span>
                 {/* Таблица источников */}
                 <EtlSourcestable remove={remove} sourceSettings={sourceSettings} />

@@ -32,8 +32,17 @@ export const sessionApi = API.injectEndpoints({
         }),
         getSession: builder.query({
             query: (id) => `/etl-setup/sessions/${id}`
+        }),
+        chooseDataBase: builder.mutation({
+            query: ({ id, body }) => {
+                return {
+                    url: `/etl-setup/sessions/${id}/choose-data-base`,
+                    method: 'POST',
+                    body
+                }
+            }
         })
     })
 })
 
-export const { useCreateSessionMutation, useGetSessionQuery, useGetSessionsQuery } = sessionApi
+export const { useCreateSessionMutation, useGetSessionQuery, useGetSessionsQuery, useChooseDataBaseMutation } = sessionApi
