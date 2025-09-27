@@ -72,3 +72,51 @@ export const STATIC_DB_ARRAY = [
     disabled: true
   },
 ];
+
+export const clickhouseSourceForm = {
+  host: "clickhouse-headless",
+  port: "8123",
+  username: "default",
+  password: "v68YeRr76E",
+  database: "system"
+}
+
+export const postgreSourceForm = {
+  host: "postgresql",
+  port: "5432",
+  username: "postgres",
+  password: "qPUlmoejb6",
+  schema: "public",
+  database: "etl-setup"
+}
+
+export const hdfsSourceForm = {
+  path: 'hdfs'
+}
+
+export const clickhouseSourceSchema = [
+  { name: 'host', title: 'Host', required: 'Обязательное поле' },
+  { name: 'port', title: 'Порт', required: 'Обязательное поле' },
+  { name: 'username', title: 'Логин', required: 'Обязательное поле' },
+  { name: 'password', title: 'Пароль', required: 'Обязательное поле' },
+  { name: 'database', title: 'Имя базы данных', required: 'Обязательное поле' },
+]
+
+export const postgreSourceSchema = [
+  { name: 'host', title: 'Host', required: 'Обязательное поле' },
+  { name: 'port', title: 'Порт', required: 'Обязательное поле' },
+  { name: 'username', title: 'Логин', required: 'Обязательное поле' },
+  { name: 'password', title: 'Пароль', required: 'Обязательное поле' },
+  { name: 'database', title: 'Имя базы данных', required: 'Обязательное поле' },
+  { name: 'schema', title: 'Схема', required: 'Обязательное поле' },
+]
+
+export const hdfsSourceSchema = [
+  { name: 'path', title: 'Путь', required: 'Обязательное поле' },
+]
+
+export const SOURCE_MAP_SETTINGS: any = {
+  POSTGRES: 'PostgreSQLDataSourceSettings',
+  HDFS: 'HDFSDataSourceSettings',
+  CLICK_HOUSE: 'ClickHouseDataSourceSettings',
+}

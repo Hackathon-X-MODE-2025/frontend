@@ -1,8 +1,10 @@
 import { useParams } from "react-router-dom";
 import { useChooseDataBaseMutation, useGetSessionQuery } from "../../../entities/session/session-api";
-import { RECOMENDATION_COLOR_TEMPERATURE, STATIC_DB_ARRAY } from "../model/constants";
+import { clickhouseSourceForm, clickhouseSourceSchema, hdfsSourceForm, hdfsSourceSchema, postgreSourceForm, postgreSourceSchema, RECOMENDATION_COLOR_TEMPERATURE, STATIC_DB_ARRAY } from "../model/constants";
 import { SessionSourceItem } from "../../../features/session-source-item/ui";
 import { useEffect, useState } from "react";
+import { SessionSourceItemParamsForm } from "../../../features/session-source-item-params-form/ui";
+import { toast } from "react-toastify";
 
 
 export const SessionsChooseSource = () => {
@@ -16,6 +18,11 @@ export const SessionsChooseSource = () => {
     const [chooseTrigger] = useChooseDataBaseMutation()
 
     const [sortedData, setSortedData] = useState<any[]>([])
+    const [choosedSource, setChoosedSource] = useState<string | null>(null)
+
+    const [clickHouseModal, setClickHouseModal] = useState(false)
+    const [postgreModal, setPostgreModal] = useState(false)
+    const [hdfsModal, setHdfsModal] = useState(false)
 
     useEffect(() => {
         if (!isSuccess) return
@@ -63,9 +70,51 @@ export const SessionsChooseSource = () => {
 
     }, [isFetching])
 
+    const handleChooseSource = (name: string) => {
+        setChoosedSource(name)
+        if (name === 'POSTGRES') {
+            setPostgreModal(true)
+        }
 
-    const handleChooseRecomendation = (name: string) => {
-        chooseTrigger({ id: id, body: { dataSource: name } })
+        if (name === 'HDFS') {
+            setHdfsModal(true)
+        }
+
+        if (name === 'CLICK_HOUSE') {
+            setClickHouseModal(true)
+        }
+    }
+
+    const handleChooseRecomendation = (result: any) => {
+        chooseTrigger({ id: id, body: { dataSourceSettings: result } })
+            .unwrap()
+            .then(() => {
+                if (result.type === 'POSTGRES') {
+                    setPostgreModal(false)
+                }
+
+                if (result.type === 'HDFS') {
+                    setHdfsModal(false)
+                }
+
+                if (result.type === 'CLICK_HOUSE') {
+                    setClickHouseModal(false)
+                }
+                setChoosedSource(null)
+            })
+            .catch(() => toast.error('Ошибка сервера'))
+    }
+
+    const handleCloseClickHouseModal = () => {
+        setClickHouseModal(false)
+    }
+
+    const handleClosePostgreModal = () => {
+        setPostgreModal(false)
+    }
+
+    const handleCloseHdfsModal = () => {
+        setHdfsModal(false)
     }
 
     if (!isSuccess) return
@@ -90,7 +139,7 @@ export const SessionsChooseSource = () => {
                             isDisabled={el.disabled}
                             icon={el.icon}
                             content={el.reason}
-                            confirm={handleChooseRecomendation}
+                            confirm={handleChooseSource}
                             index={i + 1}
                         />
                     ))}
@@ -106,12 +155,43 @@ export const SessionsChooseSource = () => {
                             isDisabled={el.disabled}
                             icon={el.icon}
                             content={el.reason}
-                            confirm={handleChooseRecomendation}
+                            confirm={handleChooseSource}
                             index={i + 1 + half}
                         />
                     ))}
                 </div>
             </div>
+
+            <SessionSourceItemParamsForm
+                formName={choosedSource as string}
+                title="CLICK_HOUSE"
+                open={clickHouseModal}
+                handleClose={handleCloseClickHouseModal}
+                formSchema={clickhouseSourceSchema}
+                formValues={clickhouseSourceForm}
+                complete={handleChooseRecomendation}
+            />
+
+            <SessionSourceItemParamsForm
+                formName={choosedSource as string}
+                title="POSTGRES"
+                open={postgreModal}
+                handleClose={handleClosePostgreModal}
+                formSchema={postgreSourceSchema}
+                formValues={postgreSourceForm}
+                complete={handleChooseRecomendation}
+            />
+
+            <SessionSourceItemParamsForm
+                formName={choosedSource as string}
+                title="HDFS"
+                open={hdfsModal}
+                handleClose={handleCloseHdfsModal}
+                formSchema={hdfsSourceSchema}
+                formValues={hdfsSourceForm}
+                complete={handleChooseRecomendation}
+            />
+
         </div>
     )
 }
