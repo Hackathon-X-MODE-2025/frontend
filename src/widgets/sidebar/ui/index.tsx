@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from "react"
 import { useGetSessionsQuery } from "../../../entities/session/session-api"
 import { Logo } from "../../../shared/svg_components/logo"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import { formatCreatedDate } from "../../../shared/utils/format"
 
 
 export const Sidebar = () => {
+    const { id } = useParams()
 
     const navigate = useNavigate()
 
@@ -82,8 +83,8 @@ export const Sidebar = () => {
                     <button
                         key={i}
                         onClick={() => handleSession(session.id)}
-                        className="text-start h-[53px] w-full text-default rounded-[10px] px-[15px] 
-                       hover:bg-[#343447] cursor-pointer"
+                        className={`text-start h-[53px] w-full text-default rounded-[10px] px-[15px] 
+                       hover:bg-[#343447] cursor-pointer ${id === session.id && 'bg-[#343447]'}`}
                     >
                         {formatCreatedDate(session.createdDate)}
                     </button>
