@@ -138,10 +138,10 @@ export const EtlInit = () => {
 
 
     const handleSave = () => {
-        if (sourceSettings.length > 0) {
-            toast.warning('Можно выбрать только 1 источник')
-            return
-        }
+        // if (sourceSettings.length > 0) {
+        //     toast.warning('Можно выбрать только 1 источник')
+        //     return
+        // }
         if (!type) return;
         if ((type === "CsvHDFSSourceSettings" || type === "XmlHDFSSourceSettings") && !param) {
             setValidationError(true);
