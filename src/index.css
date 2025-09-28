@@ -47,3 +47,7 @@
 * {
     scrollbar-width: thin;
 }
+
+.react-flow__attribution {
+    display: none !important;
+}

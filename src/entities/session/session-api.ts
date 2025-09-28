@@ -14,6 +14,31 @@ interface ICreateSessionRes {
     status: string
 }
 
+export interface EtlSessionChatDto {
+    id: number;
+    ddl: string;
+    dag: string;
+    createdDate: string;
+    modifiedDate: string;
+}
+
+export interface PageInfo {
+    size: number;
+    number: number;
+    totalElements: number;
+    totalPages: number;
+}
+
+export interface PagedModelEtlSessionChatDto {
+    content: EtlSessionChatDto[];
+    page: PageInfo;
+}
+
+export interface PageableRequest {
+    page: number;
+    // size: number;
+}
+
 export const sessionApi = API.injectEndpoints({
     endpoints: (builder) => ({
         createSession: builder.mutation<ICreateSessionRes, ICreateSessionReq>({
@@ -41,8 +66,15 @@ export const sessionApi = API.injectEndpoints({
                     body
                 }
             }
+        }),
+        getChat: builder.query<PagedModelEtlSessionChatDto, PageableRequest>({
+            query: ({ page }) => {
+                return {
+                    url: `/etl-setup/sessions/1f0ef9f6-e777-44dd-8bac-c738a6701bf7/chats?page=${page}&size=30&sort=id,Asc`
+                }
+            }
         })
     })
 })
 
-export const { useCreateSessionMutation, useGetSessionQuery, useGetSessionsQuery, useChooseDataBaseMutation } = sessionApi
+export const { useCreateSessionMutation, useGetSessionQuery, useGetSessionsQuery, useChooseDataBaseMutation, useGetChatQuery } = sessionApi
