@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useGetChatQuery } from "../../../entities/session/session-api";
 import { CodeEditor } from "../../../features/chat-code-editor/ui";
+import { ChatPipeline } from "../../../features/chat-pipeline/ui";
 
 export const ChatReadWindow = () => {
     const [page, setPage] = useState(0);
@@ -8,6 +9,8 @@ export const ChatReadWindow = () => {
     const [editedSql, setEditedSql] = useState('')
     const [editedDag, setEditedDag] = useState('')
     const scrollRef = useRef<HTMLDivElement | null>(null);
+
+    console.log(editedDag, editedSql)
 
     const {
         data: chatData,
@@ -70,6 +73,9 @@ export const ChatReadWindow = () => {
                         <div className="flex flex-col gap-5 w-1/2">
                             <CodeEditor language={'python'} code={msg.dag} onChange={(value: any) => setEditedDag(value ?? '')} />
                             <CodeEditor language={'sql'} code={msg.ddl} onChange={(value: any) => setEditedSql(value ?? '')} />
+                        </div>
+                        <div className="w-1/2 self-start">
+                            <ChatPipeline />
                         </div>
 
                     </div>

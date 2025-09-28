@@ -11,6 +11,8 @@ export const Chat = () => {
         refetchOnMountOrArgChange: true,
     });
 
+    console.group(sessionData)
+
     if (!isSuccess) return
     return (
         <div className='h-full relative font-raleway'>
