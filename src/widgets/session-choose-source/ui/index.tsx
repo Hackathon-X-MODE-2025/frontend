@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useChooseDataBaseMutation, useGetSessionQuery } from "../../../entities/session/session-api";
 import { clickhouseSourceForm, clickhouseSourceSchema, hdfsSourceForm, hdfsSourceSchema, postgreSourceForm, postgreSourceSchema, RECOMENDATION_COLOR_TEMPERATURE, STATIC_DB_ARRAY } from "../model/constants";
 import { SessionSourceItem } from "../../../features/session-source-item/ui";
@@ -9,6 +9,7 @@ import { toast } from "react-toastify";
 
 export const SessionsChooseSource = () => {
     const { id } = useParams()
+    const navigate = useNavigate()
 
     const { data: sessionData, isSuccess, isFetching } = useGetSessionQuery(id, {
         pollingInterval: 1000,
@@ -101,6 +102,7 @@ export const SessionsChooseSource = () => {
                     setClickHouseModal(false)
                 }
                 setChoosedSource(null)
+                navigate(`/s/${id}/c`)
             })
             .catch(() => toast.error('Ошибка сервера'))
     }
