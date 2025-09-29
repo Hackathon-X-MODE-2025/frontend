@@ -73,8 +73,33 @@ export const sessionApi = API.injectEndpoints({
                     url: `/etl-setup/sessions/1f0ef9f6-e777-44dd-8bac-c738a6701bf7/chats?page=${page}&size=30&sort=id,Asc`
                 }
             }
+        }),
+        patchRecomendationsChat: builder.mutation({
+            query: ({ id, body }) => {
+                return {
+                    url: `/etl-setup/sessions/${id}/chats`,
+                    method: 'PATCH',
+                    body
+                }
+            }
+        }),
+        confirmChat: builder.mutation({
+            query: (id) => {
+                return {
+                    url: `/etl-setup/sessions/${id}/chats/commit`,
+                    method: 'POST'
+                }
+            }
         })
     })
 })
 
-export const { useCreateSessionMutation, useGetSessionQuery, useGetSessionsQuery, useChooseDataBaseMutation, useGetChatQuery } = sessionApi
+export const {
+    useCreateSessionMutation,
+    useGetSessionQuery,
+    useGetSessionsQuery,
+    useChooseDataBaseMutation,
+    useGetChatQuery,
+    usePatchRecomendationsChatMutation,
+    useConfirmChatMutation
+} = sessionApi

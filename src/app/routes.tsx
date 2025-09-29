@@ -3,6 +3,7 @@ import App from "../App";
 import { WorkSpace } from "../pages/workspace/ui";
 import { Session } from "../pages/session/ui";
 import { Chat } from "../pages/chat/ui";
+import { TestPage } from "../pages/test/ui";
 
 export const routes = createBrowserRouter([
     {
@@ -20,6 +21,10 @@ export const routes = createBrowserRouter([
             {
                 path: 's/:id/c',
                 element: <Chat />
+            },
+            {
+                path: 's/:id/test/e',
+                element: <TestPage />
             }
         ]
     }
