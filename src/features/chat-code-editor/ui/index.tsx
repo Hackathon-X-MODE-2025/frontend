@@ -18,11 +18,11 @@ export const CodeEditor: React.FC<any> = ({ code, language, onSave, title, param
     };
 
 
-    const normalizeIndent = (code: string, tabSize = 1) => {
-        return code
-            .replace(/\t/g, " ".repeat(tabSize))
-            .replace(/ {2,}/g, " ");
-    };
+    // const normalizeIndent = (code: string, tabSize = 1) => {
+    //     return code
+    //         .replace(/\t/g, " ".repeat(tabSize))
+    //         .replace(/ {2,}/g, " ");
+    // };
     return (
         <div className="h-[80vh] border border-gray-700 rounded-xl overflow-hidden flex flex-col">
             {/* Верхняя панель */}
@@ -50,7 +50,7 @@ export const CodeEditor: React.FC<any> = ({ code, language, onSave, title, param
             <Editor
                 height="100%"
                 language={language}
-                value={normalizeIndent(value)}
+                value={value}
                 theme="vs-dark"
                 onChange={(val) => setValue(val ?? "")}
                 options={{
