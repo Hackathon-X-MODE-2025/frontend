@@ -4,7 +4,7 @@ export const TestPage = () => {
     return (
         <div className="flex justify-center items-center h-full">
             <video
-                src="/l.webm"
+                src="/l2.webm"
                 autoPlay
                 loop
                 muted
