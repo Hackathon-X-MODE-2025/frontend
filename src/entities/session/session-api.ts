@@ -36,6 +36,7 @@ export interface PagedModelEtlSessionChatDto {
 
 export interface PageableRequest {
     page: number;
+    id: any;
     // size: number;
 }
 
@@ -68,9 +69,9 @@ export const sessionApi = API.injectEndpoints({
             }
         }),
         getChat: builder.query<PagedModelEtlSessionChatDto, PageableRequest>({
-            query: ({ page }) => {
+            query: ({ page, id }) => {
                 return {
-                    url: `/etl-setup/sessions/1f0ef9f6-e777-44dd-8bac-c738a6701bf7/chats?page=${page}&size=30&sort=id,Asc`
+                    url: `/etl-setup/sessions/${id}/chats?page=${page}&size=30&sort=id,Asc`
                 }
             }
         }),
