@@ -1,16 +1,15 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { useGetChatQuery } from "../../../entities/session/session-api";
+import { useGetChatQuery, usePatchRecomendationsChatMutation } from "../../../entities/session/session-api";
 import { CodeEditor } from "../../../features/chat-code-editor/ui";
 import { ChatPipeline } from "../../../features/chat-pipeline/ui";
+import { useParams } from "react-router-dom";
 
 export const ChatReadWindow = () => {
+    const { id } = useParams()
     const [page, setPage] = useState(0);
     const [messages, setMessages] = useState<any[]>([]);
-    const [editedSql, setEditedSql] = useState('')
-    const [editedDag, setEditedDag] = useState('')
     const scrollRef = useRef<HTMLDivElement | null>(null);
 
-    console.log(editedDag, editedSql)
 
     const {
         data: chatData,
@@ -20,6 +19,8 @@ export const ChatReadWindow = () => {
         { page: page },
         { pollingInterval: 1000 }
     );
+
+    const [patchRecomendationTrigger] = usePatchRecomendationsChatMutation()
 
     useEffect(() => {
         if (!chatSuccess || !chatData?.content) return;
@@ -61,26 +62,42 @@ export const ChatReadWindow = () => {
         }
     }, [chatSuccess, chatData, page]);
 
+    const handleSaveRecomendations = (value: any, param: any) => {
+        patchRecomendationTrigger({
+            id: id, body: {
+                [param]: value
+            }
+        })
+    }
+
     return (
         <div
             ref={scrollRef}
-            className="h-[85%] overflow-y-auto overflow-x-hidden p-10 whitespace-pre-wrap "
+            className="h-[80%] overflow-y-auto overflow-x-hidden p-10 pb-0 whitespace-pre-wrap mt-10"
         >
             {messages.map((msg, i) => (
                 <>
                     <div key={msg.id} className="flex items-center gap-5">
                         <div className="self-end border-red-300 border">X MODE </div>
-                        <div className="flex flex-col gap-5 w-1/2">
-                            <CodeEditor language={'python'} code={msg.dag} onChange={(value: any) => setEditedDag(value ?? '')} />
-                            <CodeEditor language={'sql'} code={msg.ddl} onChange={(value: any) => setEditedSql(value ?? '')} />
+                        <div className="flex  gap-5 w-full">
+                            <div className="w-1/3">
+                                <CodeEditor onSave={handleSaveRecomendations} param='dag' title='dag' language={'python'} code={msg.dag} />
+
+                            </div>
+                            <div className="w-1/3">
+                                <CodeEditor onSave={handleSaveRecomendations} param='ddl' title='ddl' language={'sql'} code={msg.ddl} />
+
+                            </div>
+                            <div className="w-1/3">
+                                <ChatPipeline />
+
+                            </div>
+
                         </div>
-                        <div className="w-1/2 self-start">
-                            <ChatPipeline />
-                        </div>
+
 
                     </div>
                     {i !== messages.length - 1 && <hr className="border-t border-white/10 mt-2 mb-2" />}
-
                 </>
 
             ))}

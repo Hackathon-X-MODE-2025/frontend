@@ -51,3 +51,15 @@
 .react-flow__attribution {
     display: none !important;
 }
+
+.scrollbar-hidden::-webkit-scrollbar {
+    display: none;
+    /* Chrome, Safari */
+}
+
+.scrollbar-hidden {
+    -ms-overflow-style: none;
+    /* IE, Edge */
+    scrollbar-width: none;
+    /* Firefox */
+}

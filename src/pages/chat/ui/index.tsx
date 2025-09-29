@@ -1,6 +1,8 @@
 import { useParams } from "react-router-dom";
 import { useGetSessionQuery } from "../../../entities/session/session-api";
 import { ChatReadWindow } from "../../../widgets/chat-read-window/ui";
+import { ChatPromptArea } from "../../../widgets/chat-prompt-area/ui";
+import { ChatResult } from "../../../widgets/chat-result/ui";
 
 
 
@@ -17,6 +19,10 @@ export const Chat = () => {
     return (
         <div className='h-full relative font-raleway'>
             <ChatReadWindow />
+            <div className="flex">
+                <ChatPromptArea />
+                <ChatResult />
+            </div>
         </div>
     )
 }

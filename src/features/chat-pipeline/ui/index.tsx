@@ -26,7 +26,7 @@ export const ChatPipeline = () => {
     );
 
     return (
-        <div className='w-full h-[450px] border border-white text-black'>
+        <div className='w-full h-[80vh] border border-white text-black'>
             <ReactFlow
                 nodes={nodes}
                 edges={edges}
