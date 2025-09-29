@@ -16,7 +16,7 @@ export const ChatReadWindow = () => {
         isSuccess: chatSuccess,
         isFetching: chatFetching,
     } = useGetChatQuery(
-        { page: page },
+        { page: page, id: id },
         { pollingInterval: 1000 }
     );
 
@@ -78,7 +78,7 @@ export const ChatReadWindow = () => {
             {messages.map((msg, i) => (
                 <>
                     <div key={msg.id} className="flex items-center gap-5">
-                        <div className="self-end border-red-300 border">X MODE </div>
+                        <div className="self-end border-white border rounded-[50%] p-4 w-4 h-4 flex justify-center items-center">X</div>
                         <div className="flex  gap-5 w-full">
                             <div className="w-1/3">
                                 <CodeEditor onSave={handleSaveRecomendations} param='dag' title='dag' language={'python'} code={msg.dag} />
