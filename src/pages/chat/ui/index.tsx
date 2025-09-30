@@ -13,15 +13,22 @@ export const Chat = () => {
         refetchOnMountOrArgChange: true,
     });
 
-    console.group(sessionData)
-
     if (!isSuccess) return
     return (
         <div className='h-full relative font-raleway'>
+            {isSuccess && sessionData.status === 'AI_ETL_ANALYZING' && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="text-white text-lg">Анализ...</span>
+                </div>
+            )}
             <ChatReadWindow />
-            <div className="flex">
-                <ChatPromptArea />
-                <ChatResult />
+            <div className="flex items-center justify-between pr-[50px] gap-[20px]">
+                {
+                    isSuccess && sessionData.status !== 'AI_ETL_ANALYZING' && <ChatPromptArea />
+                }
+                {
+                    isSuccess && sessionData.status !== 'AI_ETL_ANALYZING' && <ChatResult />
+                }
             </div>
         </div>
     )

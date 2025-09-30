@@ -128,7 +128,7 @@ export const SessionsChooseSource = () => {
     const right = sortedData.slice(half);
 
     return (
-        <div className="py-[115px] px-[94px]">
+        <div className="py-[80px] 2xl:py-[115px] px-[94px]">
             <span>Рекомендации</span>
             <div className=" mt-[25px] grid grid-cols-2 gap-x-[30px] ">
                 {/* Левая колонка */}

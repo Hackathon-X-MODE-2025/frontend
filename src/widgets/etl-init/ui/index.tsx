@@ -346,7 +346,7 @@ export const EtlInit = () => {
 
             </div>
 
-            <div className="w-5/12 h-full flex flex-col overflow-hidden">
+            <div className="w-5/12 h-full flex flex-col ">
                 <span className="text-subtitle">Источники</span>
                 {/* Таблица источников */}
                 <EtlSourcestable remove={remove} sourceSettings={sourceSettings} />

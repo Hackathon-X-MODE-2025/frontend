@@ -26,7 +26,7 @@ export const EtlClickHouseSourceForm: React.FC<IEtlClickHouseSourceForm> = ({ cl
                             onChange={(e) => handleChangeClickHouseForm(e.target.name, e.target.value)}
                             value={clickhouseForm.host}
                             name="host"
-                            className="h-[53px] bg-secondary px-[20px] rounded-[10px] w-[350px]"
+                            className="h-[53px] bg-secondary px-[20px] rounded-[10px] w-[140px] 2xl:w-[310px]"
                             placeholder="Введите Host"
                         />
                     </div>
@@ -36,7 +36,7 @@ export const EtlClickHouseSourceForm: React.FC<IEtlClickHouseSourceForm> = ({ cl
                             onChange={(e) => handleChangeClickHouseForm(e.target.name, e.target.value)}
                             value={clickhouseForm.port}
                             name="port"
-                            className="h-[53px] bg-secondary px-[20px] rounded-[10px] w-[350px]"
+                            className="h-[53px] bg-secondary px-[20px] rounded-[10px] w-[140px] 2xl:w-[310px]"
                             placeholder="Введите порт"
                         />
                     </div>
@@ -49,7 +49,7 @@ export const EtlClickHouseSourceForm: React.FC<IEtlClickHouseSourceForm> = ({ cl
                             onChange={(e) => handleChangeClickHouseForm(e.target.name, e.target.value)}
                             value={clickhouseForm.username}
                             name="username"
-                            className="h-[53px] bg-secondary px-[20px] rounded-[10px] w-[350px]"
+                            className="h-[53px] bg-secondary px-[20px] rounded-[10px] w-[140px] 2xl:w-[310px]"
                             placeholder="Введите Логин"
                         />
                     </div>
@@ -59,7 +59,7 @@ export const EtlClickHouseSourceForm: React.FC<IEtlClickHouseSourceForm> = ({ cl
                             onChange={(e) => handleChangeClickHouseForm(e.target.name, e.target.value)}
                             value={clickhouseForm.password}
                             name="password"
-                            className="h-[53px] bg-secondary px-[20px] rounded-[10px] w-[350px]"
+                            className="h-[53px] bg-secondary px-[20px] rounded-[10px] w-[140px] 2xl:w-[310px]"
                             placeholder="Введите Пароль"
                         />
                     </div>
@@ -72,7 +72,7 @@ export const EtlClickHouseSourceForm: React.FC<IEtlClickHouseSourceForm> = ({ cl
                             onChange={(e) => handleChangeClickHouseForm(e.target.name, e.target.value)}
                             value={clickhouseForm.database}
                             name="database"
-                            className="h-[53px] bg-secondary px-[20px] rounded-[10px] w-[350px]"
+                            className="h-[53px] bg-secondary px-[20px] rounded-[10px] w-[140px] 2xl:w-[310px]"
                             placeholder="Введите имя"
                         />
                     </div>
