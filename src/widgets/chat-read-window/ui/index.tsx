@@ -78,19 +78,19 @@ export const ChatReadWindow = () => {
             {messages.map((msg, i) => (
                 <>
                     <div key={msg.id} className="flex items-center gap-5">
-                        <div className="self-end border-white border rounded-[50%] p-4 w-4 h-4 flex justify-center items-center">X</div>
                         <div className="flex  gap-5 w-full">
-                            <div className="w-1/3">
+                            <div className="flex w-6/12 flex-col gap-4 2xl:hidden">
                                 <CodeEditor onSave={handleSaveRecomendations} param='dag' title='dag' language={'python'} code={msg.dag} />
-
-                            </div>
-                            <div className="w-1/3">
                                 <CodeEditor onSave={handleSaveRecomendations} param='ddl' title='ddl' language={'sql'} code={msg.ddl} />
-
                             </div>
-                            <div className="w-1/3">
+                            <div className="w-1/3 2xl:block hidden">
+                                <CodeEditor onSave={handleSaveRecomendations} param='dag' title='dag' language={'python'} code={msg.dag} />
+                            </div>
+                            <div className="w-1/3 2xl:block hidden">
+                                <CodeEditor onSave={handleSaveRecomendations} param='ddl' title='ddl' language={'sql'} code={msg.ddl} />
+                            </div>
+                            <div className="w-6/12 2xl:w-1/3">
                                 <ChatPipeline />
-
                             </div>
 
                         </div>
@@ -101,7 +101,6 @@ export const ChatReadWindow = () => {
                 </>
 
             ))}
-
 
         </div >
     );

@@ -11,7 +11,7 @@ interface IEtlSourcestable {
 
 export const EtlSourcestable: React.FC<IEtlSourcestable> = ({ sourceSettings, remove }) => {
     return (
-        <div className="flex-1 bg-secondary rounded-tr-[10px] rounded-tl-[10px] mt-[25px] p-[20px] relative">
+        <div className="flex-1 bg-secondary rounded-tr-[10px] rounded-tl-[10px] mt-[25px] p-[20px] relative overflow-auto 2xl:overflow-auto">
             <table className="min-w-full text-sm text-left border-collapse">
                 <thead className="  uppercase text-xs font-semibold border-b border-gray-700">
                     <tr>

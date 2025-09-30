@@ -71,7 +71,7 @@ export const Sidebar = () => {
 
 
     return (
-        <aside className="w-84 bg-secondary text-white flex flex-col ">
+        <aside className="w-72 2xl:w-84 bg-secondary text-white flex flex-col ">
             <button onClick={() => navigate('/')} className="mt-[45px] px-[25px] cursor-pointer">
                 <Logo />
             </button>

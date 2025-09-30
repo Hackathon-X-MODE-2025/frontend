@@ -16,8 +16,10 @@ export const Session = () => {
 
     useEffect(() => {
         if (!isSuccess) return
-        if (sessionData.status !== 'USER_WAITING') return
-        navigate(`/s/${id}/c`)
+        if (sessionData.status === 'USER_WAITING' || sessionData.status === 'AI_ETL_ANALYZING') {
+            navigate(`/s/${id}/c`)
+
+        }
     }, [isFetching])
 
 

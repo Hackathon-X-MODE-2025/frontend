@@ -24,7 +24,7 @@ export const CodeEditor: React.FC<any> = ({ code, language, onSave, title, param
     //         .replace(/ {2,}/g, " ");
     // };
     return (
-        <div className="h-[80vh] border border-gray-700 rounded-xl overflow-hidden flex flex-col">
+        <div className="h-[38vh] 2xl:h-[80vh] border border-gray-700 rounded-xl overflow-hidden flex flex-col">
             {/* Верхняя панель */}
             <div className="flex justify-between items-center bg-[#2c2c3a] px-4 py-2 text-white">
                 <span className="font-raleway">{title}</span>
