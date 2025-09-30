@@ -1,7 +1,7 @@
 import { Box } from "@mui/material"
 import { useAppDispatch, useAppSelector } from "../../../app/hooks"
-import { setDefaultChatMode, setEtlMode } from "../model/slice"
-import { DefaultChatIco } from "../../../shared/svg_components/default-chat-ico"
+import { setEtlMode } from "../model/slice"
+// import { DefaultChatIco } from "../../../shared/svg_components/default-chat-ico"
 import { EtlChatIco } from "../../../shared/svg_components/elt-chat-ico"
 
 
@@ -17,9 +17,9 @@ export const ModeSelect = () => {
         dispatch(setEtlMode(true))
     }
 
-    const defaultChat = () => {
-        dispatch(setDefaultChatMode(true))
-    }
+    // const defaultChat = () => {
+    //     dispatch(setDefaultChatMode(true))
+    // }
 
     if (!isModeSelect) return null
 
