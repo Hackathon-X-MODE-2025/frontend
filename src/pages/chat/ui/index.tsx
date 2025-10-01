@@ -3,6 +3,7 @@ import { useGetSessionQuery } from "../../../entities/session/session-api";
 import { ChatReadWindow } from "../../../widgets/chat-read-window/ui";
 import { ChatPromptArea } from "../../../widgets/chat-prompt-area/ui";
 import { ChatResult } from "../../../widgets/chat-result/ui";
+import { EtlLoading } from "../../../shared/components/etl-loading";
 
 
 
@@ -14,6 +15,11 @@ export const Chat = () => {
     });
 
     if (!isSuccess) return
+    if (isSuccess && sessionData.status === 'ETL_CREATION') {
+        return (
+            <EtlLoading />
+        )
+    }
     return (
         <div className='h-full relative font-raleway'>
             {isSuccess && sessionData.status === 'AI_ETL_ANALYZING' && (

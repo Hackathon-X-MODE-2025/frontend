@@ -55,11 +55,14 @@ export const Sidebar = () => {
     useEffect(() => {
         const el = scrollRef.current
         if (!el) return
+
+        const hasMore = page < (sessionsData?.page?.totalPages ?? 0) - 1
+
         if (
             el.scrollHeight <= el.clientHeight &&
             !isFetching &&
             !sessionsLoading &&
-            page < (sessionsData?.totalPages ?? 0) - 1
+            hasMore
         ) {
             setPage((prev) => prev + 1)
         }
