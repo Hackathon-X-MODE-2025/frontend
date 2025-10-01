@@ -1,19 +1,34 @@
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useGetSessionQuery } from "../../../entities/session/session-api";
 import { ChatReadWindow } from "../../../widgets/chat-read-window/ui";
 import { ChatPromptArea } from "../../../widgets/chat-prompt-area/ui";
 import { ChatResult } from "../../../widgets/chat-result/ui";
+import { EtlLoading } from "../../../shared/components/etl-loading";
+import { useEffect } from "react";
 
 
 
 export const Chat = () => {
+    const navigate = useNavigate()
     const { id } = useParams()
-    const { data: sessionData, isSuccess } = useGetSessionQuery(id, {
+    const { data: sessionData, isSuccess, isFetching } = useGetSessionQuery(id, {
         pollingInterval: 1000,
         refetchOnMountOrArgChange: true,
     });
 
+    useEffect(() => {
+        if (!isSuccess) return
+        if (sessionData.status === 'FINISHED') {
+            navigate(`/s/${id}/c/f`)
+        }
+    }, [isFetching])
+
     if (!isSuccess) return
+    if (isSuccess && sessionData.status === 'ETL_CREATION') {
+        return (
+            <EtlLoading />
+        )
+    }
     return (
         <div className='h-full relative font-raleway'>
             {isSuccess && sessionData.status === 'AI_ETL_ANALYZING' && (

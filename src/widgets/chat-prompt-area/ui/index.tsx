@@ -9,9 +9,8 @@ export const ChatPromptArea = () => {
     useEffect(() => {
         const el = textareaRef.current;
         if (!el) return;
-        el.style.height = "auto"; // сброс
+        el.style.height = "auto";
         el.style.height = Math.min(el.scrollHeight, 200) + "px";
-        // тут 200px = максимум, можно поменять
     }, [value]);
     return (
         <div className="w-2/3 flex bg-secondary rounded-[10px] ml-[120px] mt-[30px] h-[85px] overflow-auto scrollbar-hidden font-ralyway relative">
