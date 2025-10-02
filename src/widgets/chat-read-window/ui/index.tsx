@@ -3,6 +3,7 @@ import { useGetChatQuery, usePatchRecomendationsChatMutation } from "../../../en
 import { CodeEditor } from "../../../features/chat-code-editor/ui";
 import { ChatPipeline } from "../../../features/chat-pipeline/ui";
 import { useParams } from "react-router-dom";
+import { toast } from "react-toastify";
 
 export const ChatReadWindow = () => {
     const { id } = useParams()
@@ -70,6 +71,16 @@ export const ChatReadWindow = () => {
                 [param]: value
             }
         })
+            .unwrap()
+            .then(() => {
+                toast.success(`${param} отредактирован!`)
+            })
+            .catch(() => {
+                toast.error('Системная ошибка!')
+                setTimeout(() => {
+                    location.reload()
+                }, 2000)
+            })
     }
 
 
@@ -82,10 +93,6 @@ export const ChatReadWindow = () => {
                 <>
                     <div key={msg.id} className="flex items-center gap-5">
                         <div className="flex flex-col  gap-5 w-full">
-                            {/* <div className="flex w-6/12 flex-col gap-4 2xl:hidden">
-                                <CodeEditor onSave={handleSaveRecomendations} param='dag' title='dag' language={'python'} code={msg.dag} />
-                                <CodeEditor onSave={handleSaveRecomendations} param='ddl' title='ddl' language={'sql'} isTabs={true} code={msg.ddl} />
-                            </div> */}
                             <div className="w-full flex gap-2">
                                 <div className="w-6/12 2xl:block ">
                                     <CodeEditor onSave={handleSaveRecomendations} param='dag' title='dag' language={'python'} code={msg.dag} />

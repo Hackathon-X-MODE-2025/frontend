@@ -14,7 +14,7 @@ import { EtlExplorer } from "../../../features/etl-explorer/ui"
 import { EtlPostgreSourceForm } from "../../../features/etl-postgre-source-form/ui"
 import { EtlClickHouseSourceForm } from "../../../features/etl-clickhouse-source-form/ui"
 import { EtlParamForm } from "../../../features/etl-param-form/ui"
-import { soruceMap } from "../../../shared/constants/etl-setup"
+// import { soruceMap } from "../../../shared/constants/etl-setup"
 import { EtlSourcestable } from "../../../features/etl-sources-table/ui"
 import { getParentPath } from "../../../shared/utils/etl-setup"
 import { EtlSetupContinue } from "../../../features/etl-setup-continue/ui"
@@ -103,10 +103,10 @@ export const EtlInit = () => {
             .unwrap()
             .then((res) => {
                 setS3Path('/')
-                const filtrationData = res.filter((el) => {
-                    return el.directory || soruceMap[type] === el.name?.split('.').slice(-1)[0]
-                })
-                setS3Data(filtrationData)
+                // const filtrationData = res.filter((el) => {
+                //     return el.directory || soruceMap[type] === el.name?.split('.').slice(-1)[0]
+                // })
+                setS3Data(res)
                 setSuccess(true)
             })
             .catch(() => {
@@ -121,10 +121,10 @@ export const EtlInit = () => {
             .unwrap()
             .then((res) => {
                 if (type === null) return
-                const filtrationData = res.filter((el) => {
-                    return el.directory || soruceMap[type] === el.name?.split('.').slice(-1)[0]
-                })
-                setS3Data(filtrationData)
+                // const filtrationData = res.filter((el) => {
+                //     return el.directory || soruceMap[type] === el.name?.split('.').slice(-1)[0]
+                // })
+                setS3Data(res)
             })
             .catch(() => {
                 toast.error('Системная ошибка')
@@ -246,10 +246,10 @@ export const EtlInit = () => {
                 .then((res) => {
                     if (type === null) return
                     setS3Path(getParentPath(s3Path))
-                    const filtrationData = res.filter((el) => {
-                        return el.directory || soruceMap[type] === el.name?.split('.').slice(-1)[0]
-                    })
-                    setS3Data(filtrationData)
+                    // const filtrationData = res.filter((el) => {
+                    //     return el.directory || soruceMap[type] === el.name?.split('.').slice(-1)[0]
+                    // })
+                    setS3Data(res)
                 })
                 .catch(() => {
                     toast.error('Системная ошибка')
@@ -261,10 +261,10 @@ export const EtlInit = () => {
             .then((res) => {
                 if (type === null) return
                 setS3Path(s3Path + name + '/')
-                const filtrationData = res.filter((el) => {
-                    return el.directory || soruceMap[type] === el.name?.split('.').slice(-1)[0]
-                })
-                setS3Data(filtrationData)
+                // const filtrationData = res.filter((el) => {
+                //     return el.directory || soruceMap[type] === el.name?.split('.').slice(-1)[0]
+                // })
+                setS3Data(res)
             })
             .catch(() => {
                 toast.error('Системная ошибка')
@@ -314,6 +314,7 @@ export const EtlInit = () => {
                             selectedFiles={selectedFiles}
                             s3Path={s3Path}
                             s3Data={s3Data}
+                            type={type}
 
                         />
                     )

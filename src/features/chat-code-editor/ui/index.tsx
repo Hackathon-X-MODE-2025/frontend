@@ -1,6 +1,8 @@
 import Editor from "@monaco-editor/react"
 import { useEffect, useState } from "react";
 import { PencilIco } from "../../../shared/svg_components/pencil-ico";
+import { SaveIco } from "../../../shared/svg_components/save-ico";
+import { CrossIco } from "../../../shared/svg_components/cross-ico";
 
 export const CodeEditor: React.FC<any> = ({ code, language, onSave, title, param, isTabs = false }) => {
 
@@ -46,21 +48,9 @@ export const CodeEditor: React.FC<any> = ({ code, language, onSave, title, param
     //         .replace(/ {2,}/g, " ");
     // };
     return (
-        <div className="h-[38vh] 2xl:h-[40vh] border border-gray-700 rounded-xl overflow-hidden flex flex-col">
-            <div className="flex justify-between items-center bg-[#2c2c3a] px-4 py-2 text-white">
-                {
-                    isTabs && <div className="max-w-[200px] flex gap-2">
-                        {
-                            isTabs && code?.length > 0 && (
-                                code.map((_: any, index: any) => (
-                                    <div onClick={() => setTabIndex(index)} className="cursor-pointer text-white ">
-                                        ddl {index}
-                                    </div>
-                                ))
-                            )
-                        }
-                    </div>
-                }
+        <div className={`h-[38vh] 2xl:h-[40vh] border border-gray-700 ${isTabs && 'border-t-0'} rounded-xl overflow-hidden flex flex-col`}>
+            {!isTabs && <div className="flex justify-between items-center bg-[#2c2c3a] px-4 py-2 text-white">
+
                 {!isTabs && <span className="font-raleway text-start">{title}</span>}
                 <div className="flex gap-3">
                     {!isEditing ? (
@@ -69,16 +59,37 @@ export const CodeEditor: React.FC<any> = ({ code, language, onSave, title, param
                         </button>
                     ) : (
                         <>
-                            <button onClick={handleSave} className="hover:text-green-400">
-                                Сохранить
+                            <button onClick={handleSave} className="hover:text-green-400 cursor-pointer">
+                                <SaveIco />
                             </button>
-                            <button onClick={handleCancel} className="hover:text-red-400">
-                                Отменить
+                            <button onClick={handleCancel} className="hover:text-red-400 cursor-pointer">
+                                <CrossIco />
                             </button>
                         </>
                     )}
                 </div>
-            </div>
+            </div>}
+
+            {isTabs && (
+                <div className="flex gap-2 overflow-x-auto shrink-0">
+                    {
+                        isTabs && code?.length > 0 && (
+                            code.map((_: any, index: any) => (
+                                <TabsEnhacer
+                                    setTabIndex={setTabIndex}
+                                    index={index}
+                                    tabIndex={tabIndex}
+                                    isEditing={isEditing}
+                                    handleCancel={handleCancel}
+                                    handleSave={handleSave}
+                                    setIsEditing={setIsEditing}
+                                />
+                            ))
+                        )
+                    }
+                </div>
+            )}
+
 
             {/* Сам редактор */}
             <Editor
@@ -99,4 +110,31 @@ export const CodeEditor: React.FC<any> = ({ code, language, onSave, title, param
             />
         </div>
     );
+}
+
+export const TabsEnhacer: React.FC<any> = ({ setTabIndex, index, isEditing, handleCancel, handleSave, setIsEditing, tabIndex }) => {
+    return (
+        <div onClick={() => setTabIndex(index)} className="bg-secondary rounded-tr-[10px] rounded-tl-[10px] cursor-pointer text-white px-4 py-2 flex gap-2 items-center">
+            <div>
+                ddl {index}
+            </div>
+            {index === tabIndex && <div className="flex gap-3">
+                {!isEditing ? (
+                    <button onClick={() => setIsEditing(true)} className="hover:text-blue-400">
+                        <PencilIco />
+                    </button>
+                ) : (
+                    <>
+                        <button onClick={handleSave} className="hover:text-green-400 cursor-pointer">
+                            <SaveIco />
+                        </button>
+                        <button onClick={handleCancel} className="hover:text-red-400 cursor-pointer">
+                            <CrossIco />
+                        </button>
+                    </>
+                )}
+            </div>}
+
+        </div>
+    )
 }
