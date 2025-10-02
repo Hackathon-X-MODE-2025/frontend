@@ -4,12 +4,13 @@ import { ChatReadWindow } from "../../../widgets/chat-read-window/ui";
 import { ChatPromptArea } from "../../../widgets/chat-prompt-area/ui";
 import { ChatResult } from "../../../widgets/chat-result/ui";
 import { EtlLoading } from "../../../shared/components/etl-loading";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 
 
 export const Chat = () => {
     const navigate = useNavigate()
+    const [finishLoading, setFinishLoading] = useState(false)
     const { id } = useParams()
     const { data: sessionData, isSuccess, isFetching } = useGetSessionQuery(id, {
         pollingInterval: 1000,
@@ -24,7 +25,7 @@ export const Chat = () => {
     }, [isFetching])
 
     if (!isSuccess) return
-    if (isSuccess && sessionData.status === 'ETL_CREATION') {
+    if ((isSuccess && sessionData.status === 'ETL_CREATION') || finishLoading) {
         return (
             <EtlLoading />
         )
@@ -42,7 +43,7 @@ export const Chat = () => {
                     isSuccess && sessionData.status !== 'AI_ETL_ANALYZING' && <ChatPromptArea />
                 }
                 {
-                    isSuccess && sessionData.status !== 'AI_ETL_ANALYZING' && <ChatResult />
+                    isSuccess && sessionData.status !== 'AI_ETL_ANALYZING' && <ChatResult setLoading={setFinishLoading} />
                 }
             </div>
         </div>
