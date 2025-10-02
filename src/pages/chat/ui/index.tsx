@@ -5,6 +5,7 @@ import { ChatPromptArea } from "../../../widgets/chat-prompt-area/ui";
 import { ChatResult } from "../../../widgets/chat-result/ui";
 import { EtlLoading } from "../../../shared/components/etl-loading";
 import { useEffect, useState } from "react";
+import { EtlAnalyzing } from "../../../shared/components/etl-analyzing";
 
 
 
@@ -30,13 +31,18 @@ export const Chat = () => {
             <EtlLoading />
         )
     }
+    if (isSuccess && sessionData.status === 'AI_ETL_ANALYZING') {
+        return (
+            <EtlAnalyzing />
+        )
+    }
     return (
         <div className='h-full relative font-raleway'>
-            {isSuccess && sessionData.status === 'AI_ETL_ANALYZING' && (
+            {/* {isSuccess && sessionData.status === 'AI_ETL_ANALYZING' && (
                 <div className="absolute inset-0 flex items-center justify-center">
                     <span className="text-white text-lg">Анализ...</span>
                 </div>
-            )}
+            )} */}
             <ChatReadWindow />
             <div className="flex items-center justify-between pr-[50px] gap-[20px]">
                 {
