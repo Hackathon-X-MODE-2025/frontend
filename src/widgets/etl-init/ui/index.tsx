@@ -106,7 +106,7 @@ export const EtlInit = () => {
                 const filtrationData = res.filter((el) => {
                     return el.directory || soruceMap[type] === el.name?.split('.').slice(-1)[0]
                 })
-                setS3Data(filtrationData)
+                setS3Data(res)
                 setSuccess(true)
             })
             .catch(() => {
@@ -124,7 +124,7 @@ export const EtlInit = () => {
                 const filtrationData = res.filter((el) => {
                     return el.directory || soruceMap[type] === el.name?.split('.').slice(-1)[0]
                 })
-                setS3Data(filtrationData)
+                setS3Data(res)
             })
             .catch(() => {
                 toast.error('Системная ошибка')
@@ -249,7 +249,7 @@ export const EtlInit = () => {
                     const filtrationData = res.filter((el) => {
                         return el.directory || soruceMap[type] === el.name?.split('.').slice(-1)[0]
                     })
-                    setS3Data(filtrationData)
+                    setS3Data(res)
                 })
                 .catch(() => {
                     toast.error('Системная ошибка')
@@ -264,7 +264,7 @@ export const EtlInit = () => {
                 const filtrationData = res.filter((el) => {
                     return el.directory || soruceMap[type] === el.name?.split('.').slice(-1)[0]
                 })
-                setS3Data(filtrationData)
+                setS3Data(res)
             })
             .catch(() => {
                 toast.error('Системная ошибка')
@@ -314,6 +314,7 @@ export const EtlInit = () => {
                             selectedFiles={selectedFiles}
                             s3Path={s3Path}
                             s3Data={s3Data}
+                            type={type}
 
                         />
                     )

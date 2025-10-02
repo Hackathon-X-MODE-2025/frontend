@@ -3,6 +3,7 @@ import type { IBrowseStoreRes } from "../../../entities/hdfs/hdfs-api"
 import { FolderIco } from "../../../shared/svg_components/folder-ico"
 import { icoHelper } from "../../../shared/utils/etl-setup"
 import { formatDate, formatSize } from "../../../shared/utils/format";
+import { soruceMap } from "../../../shared/constants/etl-setup";
 
 interface IEtlExplorer {
     s3Data: [] | IBrowseStoreRes[],
@@ -10,9 +11,10 @@ interface IEtlExplorer {
     handleToggleFile: (path: string) => void;
     handleChangeDir: (path: string, isBack?: boolean) => void;
     s3Path: string;
+    type: string;
 }
 
-export const EtlExplorer: React.FC<IEtlExplorer> = ({ s3Data, selectedFiles, handleToggleFile, handleChangeDir, s3Path }) => {
+export const EtlExplorer: React.FC<IEtlExplorer> = ({ s3Data, selectedFiles, handleToggleFile, handleChangeDir, s3Path, type }) => {
     return (
         <div className="flex-1 overflow-y-auto border border-b-0 border-secondary">
 
@@ -53,43 +55,46 @@ export const EtlExplorer: React.FC<IEtlExplorer> = ({ s3Data, selectedFiles, han
                             </tr>
                         )
                     }
-                    {s3Data.map((file) => (
-                        <tr key={file.name} className="relative hover:bg-[#65658C1A] border-b border-[#65658C80]">
-                            <td className="px-4 py-3 ">
-                                {
-                                    !file.directory && <input
-                                        type="checkbox"
-                                        className="h-4 w-4 rounded "
-                                        checked={selectedFiles.includes(s3Path + file.name)}
-                                        onChange={() => handleToggleFile(s3Path + file.name)}
-                                    />
-                                }
-                            </td>
-                            <td className="px-4 py-3 flex items-center gap-2 ">
-                                {
-                                    file.directory && (
-                                        <button onClick={() => handleChangeDir(file.name)} className="flex items-center gap-1 cursor-pointer">
-                                            <FolderIco />
-                                            {file.name}
-                                        </button>
-                                    )
-                                }
-                                {!file.directory && (<>
+                    {s3Data.map((file) => {
+                        return (
+                            <tr key={file.name} className="relative hover:bg-[#65658C1A] border-b border-[#65658C80]">
+                                <td className="px-4 py-3 ">
                                     {
-                                        icoHelper(file.name?.split('.').slice(-1)[0])
+                                        !file.directory && <input
+                                            type="checkbox"
+                                            disabled={file.name?.split('.').slice(-1)[0] !== soruceMap[type]}
+                                            className="h-4 w-4 rounded "
+                                            checked={selectedFiles.includes(s3Path + file.name)}
+                                            onChange={() => handleToggleFile(s3Path + file.name)}
+                                        />
                                     }
-                                    {file.name}
-                                </>)}
+                                </td>
+                                <td className="px-4 py-3 flex items-center gap-2 ">
+                                    {
+                                        file.directory && (
+                                            <button onClick={() => handleChangeDir(file.name)} className="flex items-center gap-1 cursor-pointer">
+                                                <FolderIco />
+                                                {file.name}
+                                            </button>
+                                        )
+                                    }
+                                    {!file.directory && (<>
+                                        {
+                                            icoHelper(file.name?.split('.').slice(-1)[0])
+                                        }
+                                        {file.name}
+                                    </>)}
 
-                            </td>
-                            <td className="px-4 py-3 whitespace-nowrap">
-                                {formatSize(Number(file.size))}
-                            </td>
-                            <td className="px-4 py-3 whitespace-nowrap">
-                                {formatDate(file.lastModified)}
-                            </td>
-                        </tr>
-                    ))}
+                                </td>
+                                <td className="px-4 py-3 whitespace-nowrap">
+                                    {formatSize(Number(file.size))}
+                                </td>
+                                <td className="px-4 py-3 whitespace-nowrap">
+                                    {formatDate(file.lastModified)}
+                                </td>
+                            </tr>
+                        )
+                    })}
                 </tbody>
             </table>
         </div>
