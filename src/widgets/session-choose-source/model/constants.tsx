@@ -18,6 +18,8 @@ export const STATIC_DB_ARRAY = [
   {
     dataSource: "HDFS",
     reason: "Нет рекомендаций",
+    cons: [],
+    pros: [],
     suitabilityScore: 0,
     icon: <HadoopIco />,
     disabled: false
@@ -25,6 +27,8 @@ export const STATIC_DB_ARRAY = [
   {
     dataSource: "CLICK_HOUSE",
     reason: "Нет рекомендаций",
+    cons: [],
+    pros: [],
     suitabilityScore: 0,
     icon: <ClickhouseDbIco />,
     disabled: false
@@ -32,6 +36,8 @@ export const STATIC_DB_ARRAY = [
   {
     dataSource: "POSTGRES",
     reason: "Нет рекомендаций",
+    cons: [],
+    pros: [],
     suitabilityScore: 0,
     icon: <PostgreSQLIco />,
     disabled: false
@@ -39,6 +45,8 @@ export const STATIC_DB_ARRAY = [
   {
     dataSource: "MONGO_DB",
     reason: "Нет рекомендаций",
+    cons: [],
+    pros: [],
     suitabilityScore: 0,
     icon: <MongoIco />,
     disabled: true
@@ -46,6 +54,8 @@ export const STATIC_DB_ARRAY = [
   {
     dataSource: "CASSANDRA",
     reason: "Нет рекомендаций",
+    cons: [],
+    pros: [],
     suitabilityScore: 0,
     icon: <CassandraIco />,
     disabled: true
@@ -60,6 +70,8 @@ export const STATIC_DB_ARRAY = [
   {
     dataSource: "TIMESCALE_DB",
     reason: "Нет рекомендаций",
+    cons: [],
+    pros: [],
     suitabilityScore: 0,
     icon: <TimescaleIco />,
     disabled: true
@@ -67,6 +79,8 @@ export const STATIC_DB_ARRAY = [
   {
     dataSource: "SCYLLA_DB",
     reason: "Нет рекомендаций",
+    cons: [],
+    pros: [],
     suitabilityScore: 0,
     icon: <ScyllaIco />,
     disabled: true

@@ -36,12 +36,13 @@ export const SessionsChooseSource = () => {
                 return {
                     ...el,
                     reason: target.reason,
+                    cons: target?.cons,
+                    pros: target?.pros,
                     suitabilityScore: target.suitabilityScore
                 }
             }
             return {
                 ...el,
-
             }
         })
             .sort((a, b) => b.suitabilityScore - a.suitabilityScore)
@@ -136,6 +137,8 @@ export const SessionsChooseSource = () => {
                     {left.map((el, i) => (
                         <SessionSourceItem
                             key={el.dataSource}
+                            pros={el.pros}
+                            cons={el.cons}
                             title={`${el.dataSource}`}
                             background={el.background}
                             isDisabled={el.disabled}
@@ -152,6 +155,8 @@ export const SessionsChooseSource = () => {
                     {right.map((el, i) => (
                         <SessionSourceItem
                             key={el.dataSource}
+                            pros={el.pros}
+                            cons={el.cons}
                             title={`${el.dataSource}`}
                             background={el.background}
                             isDisabled={el.disabled}
