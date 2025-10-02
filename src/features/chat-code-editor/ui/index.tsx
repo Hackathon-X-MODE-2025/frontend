@@ -102,7 +102,7 @@ export const CodeEditor: React.FC<any> = ({ code, language, onSave, title, param
                     tabSize: 2,
                     insertSpaces: true,
                     detectIndentation: false,
-                    readOnly: !isEditing, // 🔥 главный момент
+                    readOnly: !isEditing,
                 }}
             />
         </div>
