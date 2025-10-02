@@ -1,11 +1,10 @@
-import { useNavigate, useParams } from "react-router-dom"
+import { useParams } from "react-router-dom"
 import { useConfirmChatMutation } from "../../../entities/session/session-api"
 import type React from "react"
 
 
 export const ChatResult: React.FC<any> = ({ setLoading }) => {
     const { id } = useParams()
-    const navigate = useNavigate()
     const [confirmChatTrigger] = useConfirmChatMutation()
 
     const handleConfirm = () => {
