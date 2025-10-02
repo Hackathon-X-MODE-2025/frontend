@@ -2,8 +2,8 @@
 
 export const EtlFinish = () => {
     return (
-        <div className="flex justify-center items-center text-default font-raleway">
-            ETL построен
+        <div className="flex justify-center items-center text-default font-raleway h-full">
+            <div>DAG передаван в <a target="_blank" className="border-b text-blue-400 hover:text-blue-700" href="https://air-hack.bigtows.org/">AIRFLOW</a>, ожидайте синхронизации.</div>
         </div>
     )
 }
