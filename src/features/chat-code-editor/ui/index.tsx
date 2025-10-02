@@ -16,8 +16,6 @@ export const CodeEditor: React.FC<any> = ({ code, language, onSave, title, param
             const result = [...code];
             result[tabIndex] = { ddl: value };
 
-            console.log(result);
-            console.log(value, 'aaa');
             if (onSave) onSave(result, param)
         } else {
             if (onSave) onSave(value, param);
@@ -39,8 +37,6 @@ export const CodeEditor: React.FC<any> = ({ code, language, onSave, title, param
         setValue(code[tabIndex]?.ddl || '')
     }, [tabIndex])
 
-
-    console.log(code, 'DATA BACK')
 
     // const normalizeIndent = (code: string, tabSize = 1) => {
     //     return code
@@ -74,10 +70,11 @@ export const CodeEditor: React.FC<any> = ({ code, language, onSave, title, param
                 <div className="flex gap-2 overflow-x-auto shrink-0">
                     {
                         isTabs && code?.length > 0 && (
-                            code.map((_: any, index: any) => (
+                            code.map((el: any, index: any) => (
                                 <TabsEnhacer
                                     setTabIndex={setTabIndex}
                                     index={index}
+                                    el={el}
                                     tabIndex={tabIndex}
                                     isEditing={isEditing}
                                     handleCancel={handleCancel}
@@ -112,11 +109,11 @@ export const CodeEditor: React.FC<any> = ({ code, language, onSave, title, param
     );
 }
 
-export const TabsEnhacer: React.FC<any> = ({ setTabIndex, index, isEditing, handleCancel, handleSave, setIsEditing, tabIndex }) => {
+export const TabsEnhacer: React.FC<any> = ({ setTabIndex, index, isEditing, handleCancel, handleSave, setIsEditing, tabIndex, el }) => {
     return (
         <div onClick={() => setTabIndex(index)} className="bg-secondary rounded-tr-[10px] rounded-tl-[10px] cursor-pointer text-white px-4 py-2 flex gap-2 items-center">
-            <div>
-                ddl {index}
+            <div className="text-xsmall">
+                {el?.table_name}
             </div>
             {index === tabIndex && <div className="flex gap-3">
                 {!isEditing ? (
