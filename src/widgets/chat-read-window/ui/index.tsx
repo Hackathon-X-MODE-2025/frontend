@@ -16,7 +16,7 @@ export const ChatReadWindow = () => {
         isSuccess: chatSuccess,
         isFetching: chatFetching,
     } = useGetChatQuery(
-        { page: page, id: id },
+        { page: 0, id: id },
         { pollingInterval: 1000 }
     );
 
@@ -25,16 +25,18 @@ export const ChatReadWindow = () => {
     useEffect(() => {
         if (!chatSuccess || !chatData?.content) return;
 
-        setMessages((prev) => {
-            const existingIds = new Set(prev.map((m) => m.id));
-            const uniqueNew = chatData.content.filter((m) => !existingIds.has(m.id));
+        // setMessages((prev) => {
+        //     const existingIds = new Set(prev.map((m) => m.id));
+        //     const uniqueNew = chatData.content.filter((m) => !existingIds.has(m.id));
 
-            if (page === 0) {
-                return [...prev, ...uniqueNew];
-            } else {
-                return [...uniqueNew, ...prev];
-            }
-        });
+        //     if (page === 0) {
+        //         return [...prev, ...uniqueNew];
+        //     } else {
+        //         return [...uniqueNew, ...prev];
+        //     }
+        // });
+
+        setMessages(chatData.content)
     }, [chatData, chatSuccess, page]);
 
     useEffect(() => {
@@ -70,6 +72,7 @@ export const ChatReadWindow = () => {
         })
     }
 
+
     return (
         <div
             ref={scrollRef}
@@ -78,19 +81,23 @@ export const ChatReadWindow = () => {
             {messages.map((msg, i) => (
                 <>
                     <div key={msg.id} className="flex items-center gap-5">
-                        <div className="flex  gap-5 w-full">
-                            <div className="flex w-6/12 flex-col gap-4 2xl:hidden">
+                        <div className="flex flex-col  gap-5 w-full">
+                            {/* <div className="flex w-6/12 flex-col gap-4 2xl:hidden">
                                 <CodeEditor onSave={handleSaveRecomendations} param='dag' title='dag' language={'python'} code={msg.dag} />
-                                <CodeEditor onSave={handleSaveRecomendations} param='ddl' title='ddl' language={'sql'} code={msg.ddl} />
+                                <CodeEditor onSave={handleSaveRecomendations} param='ddl' title='ddl' language={'sql'} isTabs={true} code={msg.ddl} />
+                            </div> */}
+                            <div className="w-full flex gap-2">
+                                <div className="w-6/12 2xl:block ">
+                                    <CodeEditor onSave={handleSaveRecomendations} param='dag' title='dag' language={'python'} code={msg.dag} />
+                                </div>
+                                <div className="w-6/12 2xl:block ">
+                                    <CodeEditor onSave={handleSaveRecomendations} param='ddl' title='ddl' language={'sql'} isTabs={true} code={msg.ddl} />
+                                </div>
                             </div>
-                            <div className="w-1/3 2xl:block hidden">
-                                <CodeEditor onSave={handleSaveRecomendations} param='dag' title='dag' language={'python'} code={msg.dag} />
-                            </div>
-                            <div className="w-1/3 2xl:block hidden">
-                                <CodeEditor onSave={handleSaveRecomendations} param='ddl' title='ddl' language={'sql'} code={msg.ddl} />
-                            </div>
-                            <div className="w-6/12 2xl:w-1/3">
-                                <ChatPipeline />
+
+
+                            <div className="w-full">
+                                <ChatPipeline nodes={msg.pipelineVisualization.nodes} edges={msg.pipelineVisualization.edges} />
                             </div>
 
                         </div>
