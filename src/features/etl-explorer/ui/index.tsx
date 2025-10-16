@@ -24,6 +24,10 @@ export const EtlExplorer: React.FC<IEtlExplorer> = ({ s3Data, selectedFiles, han
     const handlePreview = (type: string, path: string) => {
         console.log(type)
         previewFileTrigger(path)
+            .unwrap()
+            .then((res) => {
+                console.log(res)
+            })
     }
 
     return (
