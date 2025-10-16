@@ -14,6 +14,9 @@ export const hdfsApi = API.injectEndpoints({
         browseStore: builder.query<IBrowseStoreRes[], string>({
             query: (path) => `hdfs/browse?path=${path}`,
         }),
+        previewFile: builder.query({
+            query: (path) => `hdfs/browse/preview?path=${path}`
+        }),
 
         uploadFiles: builder.mutation<{ file: string; success: boolean }[], { files: File[]; path: string }>({
             async queryFn({ files, path }, api, _extra, baseQuery) {
@@ -81,4 +84,5 @@ export const {
     useLazyBrowseStoreQuery,
     useBrowseStoreQuery,
     useUploadFilesMutation,
+    useLazyPreviewFileQuery
 } = hdfsApi;

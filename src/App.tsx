@@ -1,6 +1,7 @@
 import { Box } from "@mui/material"
 import { Outlet } from "react-router-dom"
 import { Sidebar } from "./widgets/sidebar/ui"
+import 'react-tooltip/dist/react-tooltip.css';
 
 function App() {
 

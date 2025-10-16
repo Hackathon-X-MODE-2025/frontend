@@ -3,10 +3,16 @@ import { useGetSessionsQuery } from "../../../entities/session/session-api"
 import { Logo } from "../../../shared/svg_components/logo"
 import { useNavigate, useParams } from "react-router-dom"
 import { formatCreatedDate } from "../../../shared/utils/format"
+import { useAppDispatch } from "../../../app/hooks"
+import { setEtlMode } from "../../mode-select/model/slice"
+import { useCheckAuth } from "../../../shared/hooks/user-hooks"
 
 
 export const Sidebar = () => {
     const { id } = useParams()
+
+    const { userInfo } = useCheckAuth()
+    const dispatch = useAppDispatch()
 
     const navigate = useNavigate()
 
@@ -18,6 +24,8 @@ export const Sidebar = () => {
     const { data: sessionsData, isLoading: sessionsLoading, isSuccess: sessionsSuccess, isFetching } = useGetSessionsQuery({
         page: page,
         pageSize: 10
+    }, {
+        skip: !Boolean(userInfo?.userId)
     })
 
     useEffect(() => {
@@ -72,13 +80,19 @@ export const Sidebar = () => {
         navigate(`/s/${id}`)
     }
 
+    const handleStartPage = () => {
+        dispatch(setEtlMode(false))
+        navigate('/')
+    }
+
 
     return (
         <aside className="w-72 2xl:w-84 bg-secondary text-white flex flex-col ">
             <button onClick={() => navigate('/')} className="mt-[45px] px-[25px] cursor-pointer">
                 <Logo />
             </button>
-            <div className=" mt-[100px] px-[25px] text-small opacity-50">
+            <button onClick={handleStartPage} className="mt-[20px] border-dashed border-b w-fit self-center cursor-pointer">ETL-РЕЖИМ</button>
+            <div className=" mt-[60px] px-[25px] text-small opacity-50">
                 Активные сессии
             </div>
             <div ref={scrollRef} className="flex-1 overflow-y-auto scroll-none  mt-[10px] px-[10px]">

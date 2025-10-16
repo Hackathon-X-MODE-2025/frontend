@@ -3,6 +3,7 @@ import type { SourceSettingReq } from "../../widgets/etl-init/model/slice";
 
 
 export interface ICreateSessionReq {
+    userId: string;
     sourceSettings: SourceSettingReq[];
     expectedSizeInGB: number,
     schedulerRate: string;

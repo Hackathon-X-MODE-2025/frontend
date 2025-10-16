@@ -19,6 +19,7 @@ import { EtlSourcestable } from "../../../features/etl-sources-table/ui"
 import { getParentPath } from "../../../shared/utils/etl-setup"
 import { EtlSetupContinue } from "../../../features/etl-setup-continue/ui"
 import { PreAnalyzeModal } from "../../../features/etl-preanalyze-modal/ui"
+import { useCheckAuth } from "../../../shared/hooks/user-hooks"
 
 export const EtlInit = () => {
 
@@ -103,9 +104,6 @@ export const EtlInit = () => {
             .unwrap()
             .then((res) => {
                 setS3Path('/')
-                // const filtrationData = res.filter((el) => {
-                //     return el.directory || soruceMap[type] === el.name?.split('.').slice(-1)[0]
-                // })
                 setS3Data(res)
                 setSuccess(true)
             })
@@ -136,12 +134,12 @@ export const EtlInit = () => {
         setType('CsvHDFSSourceSettings')
     }, [])
 
+    useEffect(() => {
+        setSelectedFiles([])
+    }, [isEtlMode, type])
+
 
     const handleSave = () => {
-        // if (sourceSettings.length > 0) {
-        //     toast.warning('Можно выбрать только 1 источник')
-        //     return
-        // }
         if (!type) return;
         if ((type === "CsvHDFSSourceSettings" || type === "XmlHDFSSourceSettings") && !param) {
             setValidationError(true);
@@ -208,6 +206,7 @@ export const EtlInit = () => {
     };
 
     const [createSessionTrigger] = useCreateSessionMutation()
+    const { userInfo } = useCheckAuth()
 
     const handleAnalyze = () => {
 
@@ -218,6 +217,7 @@ export const EtlInit = () => {
             }
         })
         createSessionTrigger({
+            userId: userInfo?.userId as string,
             sourceSettings: resultSources,
             expectedSizeInGB: Number(preanalyzeForm.expectedSizeInGB),
             updateRate: preanalyzeForm.updateRate,
@@ -246,9 +246,6 @@ export const EtlInit = () => {
                 .then((res) => {
                     if (type === null) return
                     setS3Path(getParentPath(s3Path))
-                    // const filtrationData = res.filter((el) => {
-                    //     return el.directory || soruceMap[type] === el.name?.split('.').slice(-1)[0]
-                    // })
                     setS3Data(res)
                 })
                 .catch(() => {
@@ -261,9 +258,6 @@ export const EtlInit = () => {
             .then((res) => {
                 if (type === null) return
                 setS3Path(s3Path + name + '/')
-                // const filtrationData = res.filter((el) => {
-                //     return el.directory || soruceMap[type] === el.name?.split('.').slice(-1)[0]
-                // })
                 setS3Data(res)
             })
             .catch(() => {
@@ -272,6 +266,21 @@ export const EtlInit = () => {
     }
 
     const handleEtlType = (name: IEtlType) => {
+        if (selectedFiles.length !== 0) {
+            console.log(type)
+            switch (type) {
+                case 'CsvHDFSSourceSettings':
+                    toast.error('Введите разделитель и добавьте файлы!')
+                    break;
+                case 'JsonHDFSSourceSettings':
+                    toast.error('Добавьте файлы!')
+                    break;
+                case 'XmlHDFSSourceSettings':
+                    toast.error('Введите тэг и добавьте файлы!')
+                    break;
+            }
+            return;
+        }
         setType(name)
     }
 
