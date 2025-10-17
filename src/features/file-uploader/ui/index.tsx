@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { useAppSelector } from "../../../app/hooks";
 import { useUploadFilesMutation } from "../../../entities/hdfs/hdfs-api";
 import { UploadIco } from "../../../shared/svg_components/upload-ico";
@@ -9,6 +9,14 @@ import { toast } from "react-toastify";
 export const FileUploader: React.FC<any> = ({ s3Path, handleRefetch }) => {
     const [uploadFiles] = useUploadFilesMutation();
     const progress = useAppSelector((s) => s.uploadSlice.files);
+
+    useEffect(() => {
+        const intervalId = setInterval(() => {
+            handleRefetch()
+        }, 5000)
+
+        return () => clearInterval(intervalId)
+    })
 
     const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         if (!e.target.files) return;
@@ -35,7 +43,6 @@ export const FileUploader: React.FC<any> = ({ s3Path, handleRefetch }) => {
 
     return (
         <div className="mt-[25px] flex items-center border-2 border-secondary rounded-[10px] p-[20px] gap-4">
-            {/* Кнопка загрузки */}
             <button
                 type="button"
                 onClick={triggerFileInput}
@@ -45,7 +52,6 @@ export const FileUploader: React.FC<any> = ({ s3Path, handleRefetch }) => {
                 <span className="text-default">Загрузить файл</span>
             </button>
 
-            {/* Скрытый инпут */}
             <input
                 ref={inputRef}
                 type="file"
