@@ -2,6 +2,7 @@ import { Box } from "@mui/material"
 import { Outlet } from "react-router-dom"
 import { Sidebar } from "./widgets/sidebar/ui"
 import 'react-tooltip/dist/react-tooltip.css';
+import 'react-json-view-lite/dist/index.css';
 
 function App() {
 

@@ -91,7 +91,7 @@ export const Sidebar = () => {
             <button onClick={() => navigate('/')} className="mt-[45px] px-[25px] cursor-pointer">
                 <Logo />
             </button>
-            <button onClick={handleStartPage} className="mt-[20px] border-dashed border-b w-fit self-center cursor-pointer">ETL-РЕЖИМ</button>
+            <button onClick={handleStartPage} className={"mt-[20px] border-dashed border-b w-fit self-center cursor-pointer hover:text-sky-300"}>Главная</button>
             <div className=" mt-[60px] px-[25px] text-small opacity-50">
                 Активные сессии
             </div>
