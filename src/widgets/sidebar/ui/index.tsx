@@ -8,7 +8,6 @@ import { setEtlMode } from "../../mode-select/model/slice"
 import { useCheckAuth } from "../../../shared/hooks/user-hooks"
 import { HomeIco } from "../../../shared/svg_components/home-ico"
 import { EtlChatIco } from "../../../shared/svg_components/elt-chat-ico"
-import { ArrowUpIco } from "../../../shared/svg_components/arrow-up-ico"
 import { ContinueIco } from "../../../shared/svg_components/continue-ico"
 
 
