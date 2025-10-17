@@ -13,6 +13,15 @@ export const API = createApi({
 
       return headers;
     },
+    responseHandler: async (response) => {
+      const contentType = response.headers.get("content-type") || "";
+
+      if (contentType.includes("application/json")) {
+        return response.json();
+      }
+
+      return response.text();
+    },
   }),
   tagTypes: ["session", "chat"],
   endpoints: () => ({}),

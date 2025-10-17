@@ -15,7 +15,7 @@ export const hdfsApi = API.injectEndpoints({
             query: (path) => `hdfs/browse?path=${path}`,
         }),
         previewFile: builder.query({
-            query: (path) => `hdfs/browse/preview?path=${path}`
+            query: (path) => `hdfs/browse/preview?path=${path}`,
         }),
 
         uploadFiles: builder.mutation<{ file: string; success: boolean }[], { files: File[]; path: string }>({
