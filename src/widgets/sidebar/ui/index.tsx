@@ -1,18 +1,24 @@
 import { useEffect, useRef, useState } from "react"
 import { useGetSessionsQuery } from "../../../entities/session/session-api"
 import { Logo } from "../../../shared/svg_components/logo"
-import { useNavigate, useParams } from "react-router-dom"
+import { useLocation, useNavigate, useParams } from "react-router-dom"
 import { formatCreatedDate } from "../../../shared/utils/format"
-import { useAppDispatch } from "../../../app/hooks"
+import { useAppDispatch, useAppSelector } from "../../../app/hooks"
 import { setEtlMode } from "../../mode-select/model/slice"
 import { useCheckAuth } from "../../../shared/hooks/user-hooks"
+import { HomeIco } from "../../../shared/svg_components/home-ico"
+import { EtlChatIco } from "../../../shared/svg_components/elt-chat-ico"
+import { ArrowUpIco } from "../../../shared/svg_components/arrow-up-ico"
+import { ContinueIco } from "../../../shared/svg_components/continue-ico"
 
 
 export const Sidebar = () => {
     const { id } = useParams()
+    const location = useLocation();
 
     const { userInfo } = useCheckAuth()
     const dispatch = useAppDispatch()
+    const isEtlMode = useAppSelector((state) => state.modeSelectSlice.isEtlMode)
 
     const navigate = useNavigate()
 
@@ -85,28 +91,70 @@ export const Sidebar = () => {
         navigate('/')
     }
 
+    const handleEtlPage = () => {
+        dispatch(setEtlMode(true))
+        navigate('/')
+    }
+
+    const isMainPage = !isEtlMode && location.pathname === '/'
+    const isEtl = isEtlMode && location.pathname === '/'
+
+
 
     return (
         <aside className="w-72 2xl:w-84 bg-secondary text-white flex flex-col ">
-            <button onClick={() => navigate('/')} className="mt-[45px] px-[25px] cursor-pointer">
+            <button className="mt-[45px] px-[25px]">
                 <Logo />
             </button>
-            <button onClick={handleStartPage} className={"mt-[20px] border-dashed border-b w-fit self-center cursor-pointer hover:text-sky-300"}>Главная</button>
+            <div className="flex flex-col mt-[50px] font-raleway text-default ml-[10px] mr-[10px] font-[700]">
+                <button
+                    onClick={handleStartPage}
+                    className={` flex items-center  gap-[10px] text-start h-[53px] w-full text-default rounded-[10px] px-[15px] 
+                       hover:bg-[#343447] cursor-pointer ${isMainPage && 'bg-[#343447]'}`}>
+                    <HomeIco />
+                    <span>ГЛАВНАЯ</span>
+                </button>
+                <div className="h-[1px] bg-white opacity-20 rounded-full" />
+                <button
+                    onClick={handleEtlPage}
+                    className={` flex items-center  gap-[10px] text-start h-[53px] w-full text-default rounded-[10px] px-[15px] 
+                       hover:bg-[#343447] cursor-pointer ${isEtl && 'bg-[#343447]'}`}>
+                    <EtlChatIco width={14} height={14} />
+                    <span>ETL-РЕЖИМ</span>
+                </button>
+            </div>
+
             <div className=" mt-[60px] px-[25px] text-small opacity-50">
                 Активные сессии
             </div>
             <div ref={scrollRef} className="flex-1 overflow-y-auto scroll-none  mt-[10px] px-[10px]">
-                {sessionsArray.map((session, i) => (
-                    <button
-                        key={i}
-                        onClick={() => handleSession(session.id)}
-                        className={`text-start h-[53px] w-full text-default rounded-[10px] px-[15px] 
-                       hover:bg-[#343447] cursor-pointer ${id === session.id && 'bg-[#343447]'}`}
-                    >
-                        {formatCreatedDate(session.createdDate)}
-                    </button>
-                ))}
+                {sessionsArray.map((session, i) => {
+                    const isActive = id === session.id;
 
+                    return (
+                        <button
+                            key={i}
+                            onClick={() => handleSession(session.id)}
+                            className={`
+        flex justify-between items-center text-start h-[53px] w-full text-default rounded-[10px] px-[15px]
+        hover:bg-[#343447] cursor-pointer transition-colors duration-200 font-[300]
+        group
+        ${isActive && "bg-[#343447]"}
+      `}
+                        >
+                            <span>{formatCreatedDate(session.createdDate)}</span>
+
+                            <ContinueIco
+                                opacity={isActive ? 0 : 1}
+                                className={`
+          transition-opacity duration-200
+          opacity-15 group-hover:opacity-100
+          ${isActive ? "opacity-0" : ""}
+        `}
+                            />
+                        </button>
+                    );
+                })}
                 {isFetching && (
                     <div className="py-4 text-center opacity-50">Загрузка...</div>
                 )}

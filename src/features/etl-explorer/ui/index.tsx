@@ -49,12 +49,15 @@ export const EtlExplorer: React.FC<IEtlExplorer> = ({ s3Data, selectedFiles, han
 
     const handleClose = () => {
         setOpen(false)
+        setTag(null)
+        setFileName('')
+        setModalData('')
     }
 
     return (
         <>
             <EtlFilePreview isOpen={openModal} onClose={handleClose} data={modalData} tag={tag} fileName={fileName} />
-            <div className="flex-1 overflow-y-auto border border-b-0 border-secondary">
+            <div className="flex-1 overflow-y-auto border border-b-0 border-secondary mt-2">
 
                 <table className="min-w-full text-sm text-left ">
                     <thead className=" text-gray-300 uppercase text-xs font-semibold">
@@ -97,17 +100,28 @@ export const EtlExplorer: React.FC<IEtlExplorer> = ({ s3Data, selectedFiles, han
                             const fullName: string = file.name;
                             const shortName = fullName.length > 10 ? fullName.slice(0, 10) + "…" : fullName;
                             const srcType = file.name?.split('.').slice(-1)[0]
+                            const isCurrentType = !file.directory && file.name?.split('.').slice(-1)[0] !== soruceMap[type]
                             return (
-                                <tr key={file.name} className="relative hover:bg-[#65658C1A] border-b border-[#65658C80]">
+                                <tr onClick={(e) => {
+                                    e.stopPropagation()
+                                    if ((e.target as HTMLElement).closest('input')) return;
+                                    if (isCurrentType) return;
+                                    if (!file.directory) {
+                                        handleToggleFile(s3Path + file.name)
+                                    }
+                                }} key={file.name} className={`${isCurrentType && 'opacity-30'} ${isCurrentType ? '' : 'cursor-pointer'} relative hover:bg-[#65658C1A] border-b border-[#65658C80]`}>
                                     <td className="px-4 py-3">
                                         <div className="flex items-center">
                                             {
                                                 !file.directory && <input
                                                     type="checkbox"
                                                     disabled={file.name?.split('.').slice(-1)[0] !== soruceMap[type]}
-                                                    className="h-4 w-4 rounded "
+                                                    className={`h-4 w-4 rounded ${isCurrentType ? '' : 'cursor-pointer'}`}
                                                     checked={selectedFiles.includes(s3Path + file.name)}
-                                                    onChange={() => handleToggleFile(s3Path + file.name)}
+                                                    onChange={(e) => {
+                                                        e.stopPropagation()
+                                                        handleToggleFile(s3Path + file.name)
+                                                    }}
                                                 />
                                             }
                                             {
@@ -119,12 +133,17 @@ export const EtlExplorer: React.FC<IEtlExplorer> = ({ s3Data, selectedFiles, han
                                                         data-tooltip-content="Посмотреть структуру"
                                                         disabled={file.name?.split('.').slice(-1)[0] !== soruceMap[type]}
                                                         sx={{ marginLeft: "10px" }}
-                                                        onClick={() => handlePreview(srcType, s3Path + file.name, file.name)}
+                                                        onClick={(e) => {
+                                                            e.stopPropagation()
+                                                            handlePreview(srcType, s3Path + file.name, file.name)
+                                                        }}
                                                     >
                                                         <EyeIco />
                                                     </IconButton>
+                                                    {
+                                                        !isCurrentType && <Tooltip id="preview-tip" place="top" />
+                                                    }
 
-                                                    <Tooltip id="preview-tip" place="top" />
                                                 </>
                                             }
                                         </div>
@@ -133,7 +152,7 @@ export const EtlExplorer: React.FC<IEtlExplorer> = ({ s3Data, selectedFiles, han
                                     <td className="px-4 py-3 flex items-center gap-2 ">
                                         {
                                             file.directory && (
-                                                <button onClick={() => handleChangeDir(file.name)} className="flex items-center gap-1 cursor-pointer">
+                                                <button onClick={() => handleChangeDir(file.name)} className={`flex items-center gap-1 ${isCurrentType ? '' : 'cursor-pointer'}`}>
                                                     <FolderIco />
                                                     {file.name}
                                                 </button>
@@ -146,18 +165,26 @@ export const EtlExplorer: React.FC<IEtlExplorer> = ({ s3Data, selectedFiles, han
                                                 <span
                                                     data-tooltip-id={`file-${fullName}`}
                                                     data-tooltip-content={fullName}
-                                                    className="cursor-pointer"
+                                                    className={`${isCurrentType ? 'cursor-default' : 'cursor-pointer'}`}
                                                 >
                                                     {shortName}
                                                 </span>
 
-                                                <Tooltip id={`file-${fullName}`} place="top" />
+                                                {
+                                                    !isCurrentType && <Tooltip id={`file-${fullName}`} place="top" />
+                                                }
+
                                             </>
                                         )}
 
                                     </td>
                                     <td className="px-4 py-3 whitespace-nowrap">
-                                        {formatSize(Number(file.size))}
+                                        {
+                                            file.directory && '-'
+                                        }
+                                        {
+                                            !file.directory && formatSize(Number(file.size))
+                                        }
                                     </td>
                                     <td className="px-4 py-3 whitespace-nowrap">
                                         {formatDate(file.lastModified)}
@@ -234,14 +261,14 @@ export const EtlFilePreview: React.FC<EtlFilePreviewProps> = ({
         <>
             <div className="fixed inset-0 flex items-center justify-center bg-black/60 z-10" onClick={onClose} />
 
-            <div className="absolute w-[70%] h-[70%] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#65658C] p-6 rounded shadow-lg z-20 overflow-auto">
+            <div className="absolute w-[70%] h-[70%] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#65658C] p-6 rounded shadow-lg z-20 overflow-hidden">
                 <div className="flex justify-between items-center mb-3">
                     <h2 className="text-lg font-mono  text-white">
                         Предпросмотр файла ({fileName.toUpperCase()})
                     </h2>
                     <button
                         onClick={onClose}
-                        className="text-white hover:text-gray-200 transition text-xl cursor-pointer"
+                        className="text-white hover:text-gray-200 transition text-xl cursor-pointer group p-2"
                     >
                         <CrossIco />
                     </button>
@@ -255,8 +282,8 @@ export const EtlFilePreview: React.FC<EtlFilePreviewProps> = ({
 
                 <div className={`rounded p-3 ${tag.toLowerCase() === 'csv' ? 'overflow-auto' : 'overflow-hidden'} h-[calc(100%-90px)]`}>
                     {lowerTag === "csv" && Array.isArray(parsed) && parsed.length > 0 && (
-                        <table className="min-w-full text-text-small text-left font-font-sans text-white border border-black">
-                            <thead className="uppercase bg-[#65658C] text-gray-300 text-xs font-semibold sticky -top-4 z-10">
+                        <table className="min-w-full text-text-small text-left font-font-sans text-white">
+                            <thead className="uppercase bg-[#65658C] text-gray-300 text-xs font-semibold sticky -top-4 z-10 border-t-2 border-black">
                                 <tr>
                                     {Object.keys(parsed[0]).map((header) => (
                                         <th
