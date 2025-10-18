@@ -28,12 +28,12 @@ export const Chat = () => {
     if (!isSuccess) return
     if ((isSuccess && sessionData.status === 'ETL_CREATION') || finishLoading) {
         return (
-            <EtlLoading />
+            <EtlLoading progress={sessionData.process} />
         )
     }
     if (isSuccess && sessionData.status === 'AI_ETL_ANALYZING') {
         return (
-            <EtlAnalyzing />
+            <EtlAnalyzing progress={sessionData.process} />
         )
     }
     return (
