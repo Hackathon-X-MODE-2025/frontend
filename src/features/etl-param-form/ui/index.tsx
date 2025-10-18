@@ -18,7 +18,7 @@ export const EtlParamForm: React.FC<IEtlParamForm> = ({ param, handleParam, hand
                 <input
                     value={param}
                     onChange={(e) => handleParam(e.target.value)}
-                    className="p-[20px] h-[53px] w-[40%] bg-secondary rounded-[10px] text-default"
+                    className={`p-[20px] h-[53px] w-[40%] bg-secondary rounded-[10px] text-default ${validateionError && 'border-1 border-red-500'}`}
                     placeholder="Введите разделитель..."
                 />
             )}
