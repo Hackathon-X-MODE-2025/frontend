@@ -3,7 +3,7 @@
 export const EtlAnalyzing: React.FC<any> = ({ progress }) => {
     const progressValue = progress === null ? 0 : progress
     return (
-        <div className="flex justify-center items-center h-full">
+        <div className="flex flex-col justify-center items-center h-full">
             <video
                 src="/analazying.webm"
                 autoPlay

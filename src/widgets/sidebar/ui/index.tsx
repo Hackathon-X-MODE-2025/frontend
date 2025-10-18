@@ -113,7 +113,7 @@ export const Sidebar = () => {
                     <HomeIco />
                     <span>ГЛАВНАЯ</span>
                 </button>
-                <div className="h-[1px] bg-white opacity-20 rounded-full" />
+                {/* <div className="h-[1px] bg-white opacity-20 rounded-full" /> */}
                 <button
                     onClick={handleEtlPage}
                     className={` flex items-center  gap-[10px] text-start h-[53px] w-full text-default rounded-[10px] px-[15px] 

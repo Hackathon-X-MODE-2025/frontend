@@ -267,7 +267,6 @@ export const EtlInit = () => {
 
     const handleEtlType = (name: IEtlType) => {
         if (selectedFiles.length !== 0) {
-            console.log(type)
             switch (type) {
                 case 'CsvHDFSSourceSettings':
                     toast.error('Введите разделитель и добавьте файлы!')
@@ -294,9 +293,12 @@ export const EtlInit = () => {
 
     const handleClosePreanalyzed = () => {
         setPreAnalyzeModal(false)
+        setPreAnalazyForm({
+            expectedSizeInGB: null,
+            updateRate: '',
+            schedulerRate: '',
+        })
     }
-
-
 
     if (!isEtlMode) return null
 
@@ -312,7 +314,6 @@ export const EtlInit = () => {
 
                 {/*  Таблица и табы */}
                 <EtlTabs type={type} handleType={handleEtlType} />
-
 
                 {/* Проводник */}
                 {
@@ -356,7 +357,7 @@ export const EtlInit = () => {
 
             </div>
 
-            <div className="w-5/12 h-full flex flex-col ">
+            <div className={`w-5/12 h-full flex flex-col transition-all duration-300 ease-in-out ${sourceSettings.length === 0 && 'opacity-40'}`}>
                 <span className="text-subtitle">Источники</span>
                 {/* Таблица источников */}
                 <EtlSourcestable remove={remove} sourceSettings={sourceSettings} />

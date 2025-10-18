@@ -13,6 +13,7 @@ import Papa from "papaparse";
 import { XMLParser } from "fast-xml-parser";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { CrossIco } from "../../../shared/svg_components/cross-ico";
+import { motion, AnimatePresence } from "framer-motion";
 
 
 interface IEtlExplorer {
@@ -217,16 +218,12 @@ export const EtlFilePreview: React.FC<EtlFilePreviewProps> = ({
     tag,
     delimiter,
     rootTag,
-    fileName
+    fileName,
 }) => {
-    if (!isOpen || !tag || !data) return null;
-
     const lowerTag = tag?.toLowerCase();
-
     let parsed: any = null;
     let delimiterUsed = delimiter;
     let rootTagUsed = rootTag;
-
 
     try {
         switch (lowerTag) {
@@ -234,7 +231,10 @@ export const EtlFilePreview: React.FC<EtlFilePreviewProps> = ({
                 parsed = JSON.parse(data);
                 break;
             case "csv":
-                const parsedCsv = Papa.parse(data, { header: true, skipEmptyLines: true });
+                const parsedCsv = Papa.parse(data, {
+                    header: true,
+                    skipEmptyLines: true,
+                });
                 parsed = parsedCsv.data;
                 delimiterUsed = parsedCsv.meta.delimiter;
                 break;
@@ -247,119 +247,149 @@ export const EtlFilePreview: React.FC<EtlFilePreviewProps> = ({
                 parsed = data;
         }
     } catch (err) {
-        if (lowerTag === "json") {
-            parsed = data;
-        } else {
-            parsed = {
-                error: "Ошибка парсинга файла",
-                message: (err as Error).message,
-            };
-        }
+        parsed =
+            lowerTag === "json"
+                ? data
+                : {
+                    error: "Ошибка парсинга файла",
+                    message: (err as Error).message,
+                };
     }
 
     return (
-        <>
-            <div className="fixed inset-0 flex items-center justify-center bg-black/60 z-10" onClick={onClose} />
-
-            <div className="absolute w-[70%] h-[70%] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#65658C] p-6 rounded shadow-lg z-20 overflow-hidden">
-                <div className="flex justify-between items-center mb-3">
-                    <h2 className="text-lg font-mono  text-white">
-                        Предпросмотр файла ({fileName.toUpperCase()})
-                    </h2>
-                    <button
+        <AnimatePresence>
+            {isOpen && (
+                <>
+                    {/* фон */}
+                    <motion.div
+                        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.25 }}
                         onClick={onClose}
-                        className="text-white hover:text-gray-200 transition text-xl cursor-pointer group p-2"
+                    />
+
+                    {/* сама модалка */}
+                    <motion.div
+                        className="fixed top-1/2 left-1/2 z-50 w-[70%] h-[70%] -translate-x-1/2 -translate-y-1/2 bg-[#65658C] rounded-lg p-6 shadow-xl overflow-hidden flex flex-col"
+                        initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                        transition={{ type: "spring", stiffness: 260, damping: 25 }}
                     >
-                        <CrossIco />
-                    </button>
-                </div>
+                        <div className="flex justify-between items-center mb-3">
+                            <h2 className="text-lg font-mono text-white">
+                                Предпросмотр файла ({fileName?.toUpperCase()})
+                            </h2>
+                            <button
+                                onClick={onClose}
+                                className="text-white hover:text-gray-200 transition text-xl cursor-pointer p-2 
+             transform hover:rotate-180 duration-300 ease-in-out"
+                            >
+                                <CrossIco />
+                            </button>
+                        </div>
 
-                {(delimiterUsed || rootTagUsed) && (
-                    <div className="text-default text-white mb-3 space-y-1 font-mono">
-                        {delimiterUsed && <p>Разделитель: <b>{JSON.stringify(delimiterUsed)}</b></p>}
-                    </div>
-                )}
+                        {(delimiterUsed || rootTagUsed) && (
+                            <div className="text-default text-white mb-3 space-y-1 font-mono">
+                                {delimiterUsed && (
+                                    <p>
+                                        Разделитель: <b>{JSON.stringify(delimiterUsed)}</b>
+                                    </p>
+                                )}
+                            </div>
+                        )}
 
-                <div className={`rounded p-3 ${tag.toLowerCase() === 'csv' ? 'overflow-auto' : 'overflow-hidden'} h-[calc(100%-90px)]`}>
-                    {lowerTag === "csv" && Array.isArray(parsed) && parsed.length > 0 && (
-                        <table className="min-w-full text-text-small text-left font-font-sans text-white">
-                            <thead className="uppercase bg-[#65658C] text-gray-300 text-xs font-semibold sticky -top-4 z-10 border-t-2 border-black">
-                                <tr>
-                                    {Object.keys(parsed[0]).map((header) => (
-                                        <th
-                                            key={header}
-                                            className="px-4 py-3 border border-black max-w-[250px] truncate font-raleway"
-                                        >
-                                            {header}
-                                        </th>
-                                    ))}
-                                </tr>
-                            </thead>
-
-                            <tbody>
-                                {parsed.map((row, i) => (
-                                    <tr
-                                        key={i}
-                                        className="relative hover:bg-[#65658C1A] transition-colors duration-150 border border-black font-mono"
-                                    >
-                                        {Object.values(row).map((val, j) => {
-                                            const text = String(val ?? "");
-                                            const displayText =
-                                                text.length > 70 ? text.slice(0, 70) + "…" : text;
-
-                                            return (
-                                                <td
-                                                    key={j}
-                                                    data-tooltip-id={`cell-${i}-${j}`}
-                                                    data-tooltip-content={text}
-                                                    className="px-4 py-3 whitespace-pre-wrap align-top text-text-small border border-black max-w-[250px] overflow-hidden text-ellipsis"
-                                                >
-                                                    {displayText}
-                                                    <Tooltip
-                                                        id={`cell-${i}-${j}`}
-                                                        place="top"
-                                                        className="!bg-gray-800 !text-white !text-sm !rounded-lg !px-3 !py-1 z-40"
-                                                    />
-                                                </td>
-                                            );
-                                        })}
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    )}
-
-
-
-                    {["json", "xml"].includes(tag.toLowerCase()) && (
-                        <SyntaxHighlighter
-                            wrapLongLines
-                            customStyle={{
-                                backgroundColor: "#1b1920",
-                                fontSize: "12px",
-                                fontFamily: "sans-serif",
-                                whiteSpace: "pre-wrap",
-                                wordBreak: "break-word",
-                                maxHeight: "100%",
-                                overflowY: "auto",
-                                boxShadow: "none",
-                                border: "none",
-                                borderRadius: '10px',
-                                margin: 0,
-                                padding: "8px 10px",
-                            }}
-                            codeTagProps={{
-                                style: {
-                                    color: 'white',
-                                    textShadow: "none",
-                                },
-                            }}
+                        <motion.div
+                            key={lowerTag}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 10 }}
+                            transition={{ duration: 0.3, ease: "easeInOut" }}
+                            className={`flex-1 rounded p-3 ${lowerTag === "csv" ? "overflow-auto" : "overflow-hidden"
+                                }`}
                         >
-                            {data}
-                        </SyntaxHighlighter>
-                    )}
-                </div>
-            </div>
-        </>
+                            {lowerTag === "csv" &&
+                                Array.isArray(parsed) &&
+                                parsed.length > 0 && (
+                                    <table className="min-w-full text-text-small text-left font-font-sans text-white">
+                                        <thead className="uppercase bg-[#65658C] text-gray-300 text-xs font-semibold sticky -top-4 z-10 border-t-2 border-black">
+                                            <tr>
+                                                {Object.keys(parsed[0]).map((header) => (
+                                                    <th
+                                                        key={header}
+                                                        className="px-4 py-3 border border-black max-w-[250px] truncate font-raleway"
+                                                    >
+                                                        {header}
+                                                    </th>
+                                                ))}
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {parsed.map((row, i) => (
+                                                <tr
+                                                    key={i}
+                                                    className="relative hover:bg-[#65658C1A] transition-colors duration-150 border border-black font-mono"
+                                                >
+                                                    {Object.values(row).map((val, j) => {
+                                                        const text = String(val ?? "");
+                                                        const displayText =
+                                                            text.length > 70
+                                                                ? text.slice(0, 70) + "…"
+                                                                : text;
+
+                                                        return (
+                                                            <td
+                                                                key={j}
+                                                                data-tooltip-id={`cell-${i}-${j}`}
+                                                                data-tooltip-content={text}
+                                                                className="px-4 py-3 whitespace-pre-wrap align-top text-text-small border border-black max-w-[250px] overflow-hidden text-ellipsis"
+                                                            >
+                                                                {displayText}
+                                                                <Tooltip
+                                                                    id={`cell-${i}-${j}`}
+                                                                    place="top"
+                                                                    className="!bg-gray-800 !text-white !text-sm !rounded-lg !px-3 !py-1 z-40"
+                                                                />
+                                                            </td>
+                                                        );
+                                                    })}
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                )}
+
+                            {["json", "xml"].includes(lowerTag || "") && (
+                                <SyntaxHighlighter
+                                    wrapLongLines
+                                    customStyle={{
+                                        backgroundColor: "#1b1920",
+                                        fontSize: "12px",
+                                        fontFamily: "sans-serif",
+                                        whiteSpace: "pre-wrap",
+                                        wordBreak: "break-word",
+                                        maxHeight: "100%",
+                                        overflowY: "auto",
+                                        borderRadius: "10px",
+                                        margin: 0,
+                                        padding: "8px 10px",
+                                    }}
+                                    codeTagProps={{
+                                        style: {
+                                            color: "white",
+                                            textShadow: "none",
+                                        },
+                                    }}
+                                >
+                                    {data}
+                                </SyntaxHighlighter>
+                            )}
+                        </motion.div>
+                    </motion.div>
+                </>
+            )}
+        </AnimatePresence>
     );
 };

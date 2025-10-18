@@ -5,6 +5,7 @@ import { SessionSourceItem } from "../../../features/session-source-item/ui";
 import { useEffect, useState } from "react";
 import { SessionSourceItemParamsForm } from "../../../features/session-source-item-params-form/ui";
 import { toast } from "react-toastify";
+import { motion } from 'motion/react'
 
 
 export const SessionsChooseSource = () => {
@@ -129,7 +130,13 @@ export const SessionsChooseSource = () => {
     const right = sortedData.slice(half);
 
     return (
-        <div className="py-[80px] 2xl:py-[115px] px-[94px]">
+        <motion.div
+            className="py-[80px] 2xl:py-[115px] px-[94px]"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 30 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+        >
             <span>Рекомендации</span>
             <div className=" mt-[25px] grid grid-cols-2 gap-x-[30px] ">
                 {/* Левая колонка */}
@@ -199,6 +206,6 @@ export const SessionsChooseSource = () => {
                 complete={handleChooseRecomendation}
             />
 
-        </div>
+        </motion.div>
     )
 }
