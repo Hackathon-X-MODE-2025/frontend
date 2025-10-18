@@ -35,7 +35,7 @@ export const Session = () => {
                 isSuccess && sessionData.status === 'USER_CHOOSE_DATABASE' && <SessionsChooseSource />
             }
             {
-                isSuccess && (sessionData.status === 'AI_DATABASE_ANALYZING' || sessionData.status === 'ANALYZING') && <Loading />
+                isSuccess && (sessionData.status === 'AI_DATABASE_ANALYZING' || sessionData.status === 'ANALYZING') && <Loading progress={sessionData.process} />
             }
         </Box>
     )
