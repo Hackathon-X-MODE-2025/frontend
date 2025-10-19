@@ -31,8 +31,8 @@ export const Sidebar = () => {
     const scrollRef = useRef<HTMLDivElement | null>(null)
 
     const { data: sessionsData, isLoading: sessionsLoading, isSuccess: sessionsSuccess, isFetching } = useGetSessionsQuery({
-        page: page,
-        pageSize: 10
+        page: 0,
+        pageSize: 200
     }, {
         skip: !Boolean(userInfo?.userId)
     })
