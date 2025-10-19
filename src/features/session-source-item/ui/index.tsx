@@ -118,9 +118,9 @@ export const SessionSourceItem: React.FC<ISessionSourceItem> = ({
                     )}
                 </div>
 
-                {isDisabled && (
+                {/* {isDisabled && (
                     <div className="absolute w-full h-full z-10 bg-black opacity-30 top-0 left-0 rounded-[10px]" />
-                )}
+                )} */}
             </div>
         </>
     );
