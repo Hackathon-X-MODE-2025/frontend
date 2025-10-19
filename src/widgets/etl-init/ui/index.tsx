@@ -114,6 +114,10 @@ export const EtlInit = () => {
             })
     }, [type])
 
+    useEffect(() => {
+        reset()
+    }, [])
+
     const handleRefetch = () => {
         browseStoreTrigger(s3Path)
             .unwrap()
