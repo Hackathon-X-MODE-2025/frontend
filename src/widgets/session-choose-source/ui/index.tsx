@@ -131,7 +131,7 @@ export const SessionsChooseSource = () => {
 
     return (
         <motion.div
-            className="py-[80px] 2xl:py-[115px] px-[94px]"
+            className="py-[80px] 2xl:py-[90px] px-[94px]"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 30 }}

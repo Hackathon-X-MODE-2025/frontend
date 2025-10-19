@@ -14,7 +14,7 @@ export const WorkSpace = () => {
 
     return (
         <Box className='flex h-full overflow-hidden pt-[73px] pb-[44px] px-[52px]'>
-            {!userInfo?.userId && <AuthorizeForm />}
+            <AuthorizeForm />
 
             {userInfo?.userId && (
                 <>
