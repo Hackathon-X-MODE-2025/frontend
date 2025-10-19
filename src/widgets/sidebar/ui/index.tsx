@@ -30,7 +30,7 @@ export const Sidebar = () => {
     const [sessionsArray, setSessionsArray] = useState<any[]>([])
     const scrollRef = useRef<HTMLDivElement | null>(null)
 
-    const { data: sessionsData, isLoading: sessionsLoading, isSuccess: sessionsSuccess, isFetching, refetch } = useGetSessionsQuery({
+    const { data: sessionsData, isLoading: sessionsLoading, isSuccess: sessionsSuccess, isFetching } = useGetSessionsQuery({
         page: page,
         pageSize: 10
     }, {
