@@ -39,11 +39,7 @@ export const Sidebar = () => {
 
     useEffect(() => {
         if (!userInfo?.userId) {
-            refetch()
-                .unwrap()
-                .finally(() => {
-                    setSessionsArray([])
-                })
+            setSessionsArray([])
         }
     }, [userInfo])
 
